@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace TreesListModule;
 
+use Fisharebest\Webtrees\Registry;
+
 require __DIR__ . '/TreesListModule.php';
 
-return app(TreesListModule::class);
+return Registry::container()->get(TreesListModule::class);

@@ -19,6 +19,7 @@ On the website home page, this module displays a list of family trees with stati
 Install
 ----------
 After downloading and extracting the module, upload it to the webtrees `modules_v4` folder.
+The module folder must be named `family-trees-list`.
 
 Version update
 ---------------
@@ -69,3 +70,4 @@ With the help of GREG and HERMANN, the module has become increasingly mature. I 
 2. Replaced the deprecated `app()` helper with the webtrees registry container.
 3. Replaced the undefined block context constant with the explicit webtrees block context.
 4. Improved English user interface texts and clarified that sorting uses the internal tree number.
+5. Documented the required lowercase module folder name `family-trees-list`.

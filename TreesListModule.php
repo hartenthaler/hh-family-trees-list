@@ -74,13 +74,13 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     public function title(): string
     {
         /* I18N: Name of a module */
-        return I18N::translate('FamilyTree List');
+        return I18N::translate('Family tree list');
     }
 
 
     public function description(): string
     {        
-        return I18N::translate('List of FamilyTree on Website');
+        return I18N::translate('List of family trees on this website');
         
     }
 
@@ -124,7 +124,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     }
 
     /**
-     * Count the number of sources in each tree.
+     * Count the number of events in each tree.
      *
      * @return Collection<int,int>
      */
@@ -145,7 +145,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
         }
 
     /**
-     * Count the number of suenames in each tree.
+     * Count the number of surnames in each tree.
      *
      * @return Collection<int,int>
      */
@@ -186,7 +186,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
         if ($context !== ModuleBlockInterface::CONTEXT_EMBED) {
             $totaltrees=$this->tree_service->all()->count();
 
-            $title=I18N::plural('There is one tree on this website',  'This website has %d trees',$totaltrees, $totaltrees);
+            $title=I18N::plural('There is one family tree on this website',  'This website has %d family trees',$totaltrees, $totaltrees);
             return view('modules/block-template', [
                 'block'      => Str::kebab($this->name()),
                 'id'         => $block_id,
@@ -243,7 +243,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
     {
         $info_style = Validator::parsedBody($request)->string('infoStyle');   // 显示风格
-        $sort_style = Validator::parsedBody($request)->string('sortStyle');   // 排序，gedcom_id
+        $sort_style = Validator::parsedBody($request)->string('sortStyle');   // 排序，internal tree number
 
 
         $this->setBlockSetting($block_id, 'infoStyle', $info_style);
@@ -274,9 +274,9 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
 
         $sort_styles = [
             /* I18N: An option in a list-box */
-            'id_asc'  => I18N::translate('sort by Gedcom_ID, oldest first'),
+            'id_asc'  => I18N::translate('sort by internal tree number, oldest first'),
             /* I18N: An option in a list-box */
-            'id_desc' => I18N::translate('sort by Gedcom_ID, newest first'),
+            'id_desc' => I18N::translate('sort by internal tree number, newest first'),
         ];
 
         return view('config', [
@@ -308,14 +308,14 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     {
         // Note the special characters used in plural and context-sensitive translations.
         return [
-            'There is one tree on this website'. I18N::PLURAL .'This website has %d trees' => 'Es gibt einen Baum auf dieser Website'. I18N::PLURAL .'Diese Website hat %d Stammbäume',
-            'FamilyTree List' => 'Stammbaum-Liste',
-            'List of FamilyTree on Website' => 'Stammbaumliste der Website',
+            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => 'Es gibt einen Stammbaum auf dieser Website'. I18N::PLURAL .'Diese Website hat %d Stammbäume',
+            'Family tree list' => 'Stammbaum-Liste',
+            'List of family trees on this website' => 'Stammbaumliste der Website',
             'navbar' => 'Navigationsleiste',
             'card'=>'Karten',
             'capsule'=>'Plaketten',
-            'sort by Gedcom_ID, oldest first'=>'Sortieren nach Gedcom-ID, älteste zuerst',
-            'sort by Gedcom_ID, newest first'=>'Sortieren nach Gedcom-ID, neueste zuerst',
+            'sort by internal tree number, oldest first'=>'Sortieren nach interner Stammbaum-Nummer, älteste zuerst',
+            'sort by internal tree number, newest first'=>'Sortieren nach interner Stammbaum-Nummer, neueste zuerst',
             '*Click on the header to sort the values.'=>'*Klicken Sie auf die Kopfzeile, um die Werte zu sortieren.',
         ];
     }
@@ -324,15 +324,15 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     {
         // Note the special characters used in plural and context-sensitive translations.
         return [
-            'There is one tree on this website'. I18N::PLURAL .'This website has %d trees' => 'Deze website heeft één stamboom'. I18N::PLURAL .'Deze website heeft %d stambomen',
-            'FamilyTree List' => 'Stamboomlijst',
-            'List of FamilyTree on Website' => 'Lijst van stambomen op website',
+            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => 'Deze website heeft één stamboom'. I18N::PLURAL .'Deze website heeft %d stambomen',
+            'Family tree list' => 'Stamboomlijst',
+            'List of family trees on this website' => 'Lijst van stambomen op website',
             'table'=>'tabel',
             'card'=>'kaarten',
             'capsule'=>'labels',
             'navbar' => 'navigatiebalk',
-            'sort by Gedcom_ID, oldest first'=>'sorteren op Gedcom_ID, oudste eerst',
-            'sort by Gedcom_ID, newest first'=>'sorteren op Gedcom_ID, nieuwste eerst',
+            'sort by internal tree number, oldest first'=>'sorteren op intern stamboomnummer, oudste eerst',
+            'sort by internal tree number, newest first'=>'sorteren op intern stamboomnummer, nieuwste eerst',
             '*Click on the header to sort the values.'=>'*Klik op de koptekst om de waarden te sorteren',
         ];
     }
@@ -341,16 +341,16 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     {
         // 
         return [
-            'There is one tree on this website'. I18N::PLURAL .'This website has %d trees' => '本网站已收录%d部家谱',
-            'FamilyTree List' => '家谱列表',
-            'List of FamilyTree on Website' => '显示网站上的家谱列表',
+            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => '本网站已收录%d部家谱',
+            'Family tree list' => '家谱列表',
+            'List of family trees on this website' => '显示网站上的家谱列表',
             'list'=>'列  表',
             'table'=>'表  格',
             'card'=>'卡  片',
             'capsule'=>'胶  囊',
             'navbar' => '导航栏',
-            'sort by Gedcom_ID, oldest first'=>'按Gedcom_ID排序，正序',
-            'sort by Gedcom_ID, newest first'=>'按Gedcom_ID排序，倒序',
+            'sort by internal tree number, oldest first'=>'按内部家谱编号排序，正序',
+            'sort by internal tree number, newest first'=>'按内部家谱编号排序，倒序',
             '*Click on the header to sort the values.'=>'*点击表头可对数值进行排序。',
         ];
     }
@@ -359,16 +359,16 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     {
         
         return [
-            'There is one tree on this website'. I18N::PLURAL .'This website has %d trees' => '本網站已收錄%d部家譜',
-            'FamilyTree List' => '家譜列表',
-            'List of FamilyTree on Website' => '顯示網站上的家譜列表',
+            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => '本網站已收錄%d部家譜',
+            'Family tree list' => '家譜列表',
+            'List of family trees on this website' => '顯示網站上的家譜列表',
             'list'=>'列  表',
             'table'=>'表  格',
             'card'=>'卡  片',
             'capsule'=>'膠  囊',
             'navbar' => '导航栏',
-            'sort by Gedcom_ID, oldest first'=>'按Gedcom_ID排序，最老優先',
-            'sort by Gedcom_ID, newest first'=>'按Gedcom_ID排序，最新優先',
+            'sort by internal tree number, oldest first'=>'按內部家譜編號排序，最老優先',
+            'sort by internal tree number, newest first'=>'按內部家譜編號排序，最新優先',
             '*Click on the header to sort the values.'=>'*點擊表頭可對數值進行排序。',
         ];
     }

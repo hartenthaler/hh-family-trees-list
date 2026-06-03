@@ -1,8 +1,8 @@
-Family-Trees-List module for WebTrees
+Family-Trees-List module for webtrees
 =====================================
-*Family-tree-list* is a module for displaying multiple genealogical lists in webtrees.
+*Family-Trees-List* is a webtrees module for displaying an overview of all family trees on a website.
 
-### The module effect:
+### Screenshots
 
 ![capsule](https://github.com/iyoua/Family-Trees-List/assets/102014216/8fce766b-5641-4c15-95b2-6f0ba1f9d937)
 ![cards](https://github.com/iyoua/Family-Trees-List/assets/102014216/ff239166-3b00-47f6-b609-8242953b7b98)
@@ -10,7 +10,7 @@ Family-Trees-List module for WebTrees
 ![navbar](https://github.com/iyoua/Family-Trees-List/assets/102014216/898d7eec-e9e4-410d-8d33-406227eed23d)
 ![table](https://github.com/iyoua/Family-Trees-List/assets/102014216/666f99c7-7851-4500-8539-94772042e8ac)
 
-In the section of the website homepage, display a list of genealogies on the website, including statistical data for each genealogy, such as 
+On the website home page, this module displays a list of family trees with statistical data for each tree, such as:
 1. total number of families,
 2. total number of individuals,
 3. total number of surnames,
@@ -18,15 +18,15 @@ In the section of the website homepage, display a list of genealogies on the web
 
 Install
 ----------
-After downloading and decompressing, simply upload it to the modules_v4 folder of WEBTREES.
+After downloading and extracting the module, upload it to the webtrees `modules_v4` folder.
 
 Version update
 ---------------
-With the help of GREG and HERMANN, the modules have become increasingly mature, and I would like to express my gratitude to them.
+With the help of GREG and HERMANN, the module has become increasingly mature. I would like to thank them for their support.
 
 ### 1.2.1 Version Upgrade
 
-1. Added statistics on the total number of genealogies;
+1. Added statistics on the total number of family trees;
 2. Revised the list layout to accommodate longer family tree names;
 3. Modified the settings of user page blocks.
 

@@ -27,13 +27,13 @@ use Fisharebest\Webtrees\I18N;
                     
                     <?=  I18N::number(intval($individuals[$tree->id()])) ?>
                 </div>
-				<div id="navbar" class="p-1 border border-top-0 border-bottom-0" title="<?php echo I18N::translate("Surnames"); ?>">
-				    
-                    <?=  I18N::number(intval($surnames[$tree->id()])) ?>
-                </div>
                 <div id="navbar" class="p-1" title="<?php echo I18N::translate("Events"); ?>">
                     
 				    <?=  I18N::number(intval($events[$tree->id()])) ?>
+                </div>
+				<div id="navbar" class="p-1 border border-top-0 border-bottom-0" title="<?php echo I18N::translate("Surnames"); ?>">
+				    
+                    <?=  I18N::number(intval($surnames[$tree->id()])) ?>
                 </div>
 				
             </div>

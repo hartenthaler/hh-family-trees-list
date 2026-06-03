@@ -183,7 +183,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
                     'context' => $context,
                 ]);
 
-        if ($context !== self::CONTEXT_EMBED) {
+        if ($context !== ModuleBlockInterface::CONTEXT_EMBED) {
             $totaltrees=$this->tree_service->all()->count();
 
             $title=I18N::plural('There is one tree on this website',  'This website has %d trees',$totaltrees, $totaltrees);

@@ -1,55 +1,206 @@
-/* 父容器样式 */
-.family-trees-list .container {
+.family-trees-list {
+    --ftl-border: color-mix(in srgb, currentColor 18%, transparent);
+    --ftl-muted: color-mix(in srgb, currentColor 64%, transparent);
+    --ftl-surface: color-mix(in srgb, currentColor 4%, transparent);
+    --ftl-surface-strong: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.family-trees-list a {
+    text-decoration: none;
+}
+
+.family-trees-list a:hover {
+    text-decoration: underline;
+}
+
+.family-trees-list__empty {
+    border: 1px solid var(--ftl-border);
+    border-radius: .5rem;
+    color: var(--ftl-muted);
+    padding: 1rem;
+}
+
+.family-trees-list__grid {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.family-trees-list__compact-grid {
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.family-trees-list__card,
+.family-trees-list__list-item,
+.family-trees-list__capsule-row,
+.family-trees-list__navbar-row {
+    background: var(--ftl-surface);
+    border: 1px solid var(--ftl-border);
+    border-radius: .5rem;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.family-trees-list__card:hover,
+.family-trees-list__list-item:hover,
+.family-trees-list__capsule-row:hover,
+.family-trees-list__navbar-row:hover {
+    background: var(--ftl-surface-strong);
+    border-color: color-mix(in srgb, currentColor 28%, transparent);
+    box-shadow: 0 .35rem .9rem rgba(0, 0, 0, .08);
+    transform: translateY(-1px);
+}
+
+.family-trees-list__card {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    min-height: 100%;
+    padding: .85rem;
+}
+
+.family-trees-list__list-item {
+    display: grid;
+    gap: .5rem;
+    padding: .75rem;
+}
+
+.family-trees-list__title {
+    align-items: center;
+    display: inline-flex;
+    font-weight: 700;
+    gap: .45rem;
+    min-width: 0;
+}
+
+.family-trees-list__title img,
+.family-trees-list__stat img,
+.family-trees-list__table-icon {
+    height: 1.15rem;
+    object-fit: contain;
+    width: 1.15rem;
+}
+
+.family-trees-list__stats {
+    display: grid;
+    gap: .45rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.family-trees-list__list-item .family-trees-list__stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.family-trees-list__stat {
+    align-items: center;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: .4rem;
+    display: flex;
+    gap: .35rem;
+    justify-content: space-between;
+    min-width: 0;
+    padding: .4rem .5rem;
+}
+
+.family-trees-list__stat-label {
+    align-items: center;
+    color: var(--ftl-muted);
+    display: inline-flex;
+    gap: .25rem;
+    min-width: 0;
+}
+
+.family-trees-list__stat-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.family-trees-list__capsule {
+    align-items: center;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    border-radius: 999px;
+    display: inline-flex;
+    gap: .35rem;
+    min-height: 2.2rem;
+    padding: .35rem .7rem;
+}
+
+.family-trees-list__capsule-row {
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    padding: 5px; /* 设置内部填充来创建边距 */
-    border: 0 solid black;
-    width: 100%;
+    gap: .4rem;
+    margin-bottom: .45rem;
+    padding: .45rem;
 }
 
-/* 子容器样式 */
-.family-trees-list .child {
-    flex: 2; /* 设置子容器的弹性比例为1 */
-    min-width: 320px; /* min-width: 300px;设置子容器的最小宽度 */
-    /* max-width: 380px; 设置子容器的最大宽度 */
-    /*height: 70px;*/
-    padding: 5px;
-    border: 1px solid;
-    margin-bottom: 10px; /* 设置垂直外边距 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-    transition: transform 0.3s ease; /* 添加过渡效果 */
-    border-radius: 5px; /* 设置圆角 */
+.family-trees-list__capsule--title {
+    border-radius: .45rem;
+    flex: 1 1 15rem;
 }
 
-.family-trees-list .number {
+.family-trees-list__navbar-row {
+    align-items: stretch;
     display: flex;
-    justify-content: space-between; /* 项目之间均匀分布，第一个在左边，最后一个在右边 */
-    /* 或者使用 space-around，这样会在项目之间和两端都添加相等的空间 */
+    flex-wrap: wrap;
+    margin-bottom: .45rem;
+    overflow: hidden;
 }
 
-/* 鼠标经过子容器时的样式 */
-.family-trees-list .child:hover {
-    transform: translateY(-3px); /* 向上移动子容器 */
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* 增加阴影效果 */
+.family-trees-list__navbar-title {
+    align-items: center;
+    display: flex;
+    flex: 1 1 15rem;
+    min-height: 2.4rem;
+    padding: .5rem .65rem;
 }
 
-.family-trees-list hr.custom-height {
-    height: 1px; /* 设置线条高度 */
-    border: none; /* 移除默认边框 */
-    border-top: 1px dashed #000; /* 虚线样式，颜色为黑色 */
-    margin: 3px 0; /* 设置线条上下外边距 */
+.family-trees-list__navbar-stat {
+    align-items: center;
+    border-inline-start: 1px solid var(--ftl-border);
+    display: inline-flex;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    justify-content: center;
+    min-width: 4.5rem;
+    padding: .5rem .65rem;
 }
 
-.family-trees-list .zoom {
-    /* 使用filter: grayscale(100%)将图片转为灰色 */
-    filter: grayscale(100%);
-
-    /* 可以添加一些过渡效果，使颜色变化更平滑 */
-    transition: filter 0.3s ease-in-out, transform 0.3s; /* 设置过渡效果 */
+.family-trees-list__table th,
+.family-trees-list__table td {
+    vertical-align: middle;
 }
 
-.family-trees-list .zoom:hover {
-    transform: scale(1.2); /* 鼠标经过时放大1.2倍 */
-    filter: none;
+.family-trees-list__table th:not(:first-child),
+.family-trees-list__table td:not(:first-child) {
+    text-align: end;
+}
+
+.family-trees-list__sort-button {
+    align-items: center;
+    background: none;
+    border: 0;
+    color: inherit;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 700;
+    gap: .35rem;
+    padding: 0;
+}
+
+.family-trees-list__hint {
+    color: var(--ftl-muted);
+    font-size: .875rem;
+}
+
+@media (max-width: 576px) {
+    .family-trees-list__list-item .family-trees-list__stats,
+    .family-trees-list__stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .family-trees-list__navbar-stat {
+        flex: 1 1 50%;
+    }
 }

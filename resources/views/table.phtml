@@ -1,126 +1,92 @@
 <?php
 
 declare(strict_types=1);
+
 namespace TreesListModule;
+
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
 
-
 ?>
-<style>
-  .family-trees-list table td,
-  .family-trees-list table th {
-    text-align: center;
-  }
-</style> 
-
 <div class="family-trees-list">
-<div class="table-responsive">
-<table id="myTable" class="table table-sm table-striped">
+    <?php if ($all_trees === []) : ?>
+        <div class="family-trees-list__empty"><?= I18N::translate('No family trees can be shown.') ?></div>
+    <?php else : ?>
+        <?php $table_id = 'family-trees-list-table-' . (int) $block_id; ?>
+        <div class="table-responsive">
+            <table id="<?= e($table_id) ?>" class="table table-sm table-striped family-trees-list__table">
+                <thead>
+                    <tr>
+                        <th>
+                            <button class="family-trees-list__sort-button" type="button" data-family-trees-list-sort="0">
+                                <img class="family-trees-list__table-icon" src="<?= e($treeicon) ?>" alt="">
+                                <?= I18N::translate('Family tree') ?>
+                            </button>
+                        </th>
+                        <?php foreach ([['icon' => $familyicon, 'label' => I18N::translate('Families')], ['icon' => $individualicon, 'label' => I18N::translate('Individuals')], ['icon' => $eventicon, 'label' => I18N::translate('Events')], ['icon' => $surnameicon, 'label' => I18N::translate('Surnames')]] as $index => $column) : ?>
+                            <th>
+                                <button class="family-trees-list__sort-button" type="button" data-family-trees-list-sort="<?= $index + 1 ?>">
+                                    <img class="family-trees-list__table-icon" src="<?= e($column['icon']) ?>" alt="">
+                                    <?= e($column['label']) ?>
+                                </button>
+                            </th>
+                        <?php endforeach ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($all_trees as $tree) : ?>
+                        <?php $tree_id = $tree->id(); ?>
+                        <tr>
+                            <td data-sort="<?= e($tree->title()) ?>">
+                                <a href="<?= e(route(TreePage::class, ['tree' => $tree->name()])) ?>">
+                                    <strong><?= e($tree->title()) ?></strong>
+                                </a>
+                            </td>
+                            <td data-sort="<?= (int) ($families[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($families[$tree_id] ?? 0)) ?></td>
+                            <td data-sort="<?= (int) ($individuals[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($individuals[$tree_id] ?? 0)) ?></td>
+                            <td data-sort="<?= (int) ($events[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($events[$tree_id] ?? 0)) ?></td>
+                            <td data-sort="<?= (int) ($surnames[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($surnames[$tree_id] ?? 0)) ?></td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="family-trees-list__hint"><?= I18N::translate('*Click on the header to sort the values.') ?></div>
+        <script>
+        document.querySelectorAll('#<?= e($table_id) ?> [data-family-trees-list-sort]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var table = document.getElementById('<?= e($table_id) ?>');
+                var column = parseInt(button.getAttribute('data-family-trees-list-sort'), 10);
+                var tbody = table.querySelector('tbody');
+                var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+                var current = button.getAttribute('data-sort-direction') || 'asc';
+                var next = current === 'asc' ? 'desc' : 'asc';
 
-    <thead>
-        <tr>
-            <th style="text-align: center;" width="40%" onclick="sortTable(0)"  >
-                <img src="<? echo e($treeicon) ?>">&nbsp;&nbsp;<?= I18N::translate('Family tree') ?>
-            </th>
-            <th style="text-align: center;" width="15%"  onclick="sortTable(1)">
-				<img src="<?=e($familyicon)?>"><?= I18N::translate('Families') ?>*
-            </th>
-			<th style="text-align: center;" width="15%"  onclick="sortTable(2)">
-				<img src="<?=e($individualicon)?>"><?= I18N::translate('Individuals') ?>*
-            </th>
-			<th style="text-align: center;" width="15%"  onclick="sortTable(3)">
-				<img src="<?=e($eventicon)?>"><?= I18N::translate('Events') ?>*
-            </th>
-			<th style="text-align: center;" width="15%"  onclick="sortTable(4)">
-				<img src="<?=e($surnameicon)?>"><?= I18N::translate('Surnames') ?>*
-            </th>
-        </tr>
-    </thead>
+                rows.sort(function (left, right) {
+                    var leftValue = left.children[column].getAttribute('data-sort') || left.children[column].textContent;
+                    var rightValue = right.children[column].getAttribute('data-sort') || right.children[column].textContent;
+                    var leftNumber = Number(leftValue);
+                    var rightNumber = Number(rightValue);
+                    var result;
 
-    <tbody>
-        <?php foreach ($all_trees as $tree ) : ?>
-            <tr>
-                <td style="text-align: left;">
-                    <a href="<? echo e(route(TreePage::class,['tree'=>$tree->name()])); ?>">
-                    <b><?= e($tree->title()) ?></b></a>
-                </td>
-                <td >
-                     <?= I18N::number(intval($families[$tree->id()])) ?>
-                </td>
-                <td >
-                     <?=  I18N::number(intval($individuals[$tree->id()])) ?>
-                </td>
-				<td >
-                    <?=  I18N::number(intval($events[$tree->id()])) ?>
-                </td>
-				<td >
-                    <?=  I18N::number(intval($surnames[$tree->id()])) ?>
-                </td>
-				
-            </tr>
-        <?php endforeach ?>
-    </tbody>
-</table>
+                    if (!Number.isNaN(leftNumber) && !Number.isNaN(rightNumber)) {
+                        result = leftNumber - rightNumber;
+                    } else {
+                        result = leftValue.localeCompare(rightValue);
+                    }
+
+                    return next === 'asc' ? result : -result;
+                });
+
+                table.querySelectorAll('[data-family-trees-list-sort]').forEach(function (otherButton) {
+                    otherButton.removeAttribute('data-sort-direction');
+                });
+                button.setAttribute('data-sort-direction', next);
+                rows.forEach(function (row) {
+                    tbody.appendChild(row);
+                });
+            });
+        });
+        </script>
+    <?php endif ?>
 </div>
-<?= I18N::translate('*Click on the header to sort the values.') ?>
-</div>
-<script>
-function sortTable(n) {  
-  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;  
-  table = document.getElementById("myTable");  
-  switching = true;  
-  dir = "asc"; // Set the sorting direction to ascending  
-  
-  // Helper function to remove thousands separators and convert to integer  
-  function parseIntegerString(str) {  
-    // Remove commas and dots as thousands separators  
-    var noSeparators = str.replace(/[,.]/g, '');  
-    var number = parseInt(noSeparators, 10); // Convert to integer  
-    return isNaN(number) ? null : number;  
-  }  
-  
-  while (switching) {  
-    switching = false;  
-    rows = table.rows;  
-  
-    // Skip the first row (header)  
-    for (i = 1; i < (rows.length - 1); i++) {  
-      shouldSwitch = false;  
-  
-      // Get the two elements you want to compare, converting to integer for sorting  
-      x = parseIntegerString(rows[i].getElementsByTagName("TD")[n].textContent || rows[i].getElementsByTagName("TD")[n].innerText);  
-      y = parseIntegerString(rows[i + 1].getElementsByTagName("TD")[n].textContent || rows[i + 1].getElementsByTagName("TD")[n].innerText);  
-  
-      // Check if the two rows should switch place  
-      if (x !== null && y !== null) {  
-        // Both values are numbers, compare as numbers  
-        if (dir == "asc") {  
-          if (x > y) {  
-            shouldSwitch = true;  
-            break;  
-          }  
-        } else if (dir == "desc") {  
-          if (x < y) {  
-            shouldSwitch = true;  
-            break;  
-          }  
-        }  
-      }  
-    }  
-  
-    if (shouldSwitch) {  
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);  
-      switching = true;  
-      switchcount++;  
-    } else {  
-      // If no switching has been done and the direction is "asc",  
-      // set the direction to "desc" and run the while loop again.  
-      if (switchcount == 0 && dir == "asc") {  
-        dir = "desc";  
-        switching = true;  
-      }  
-    }  
-  }  
-}
-</script>

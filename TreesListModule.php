@@ -4,44 +4,43 @@ declare(strict_types=1);
 
 namespace TreesListModule;
 
-use Fisharebest\Webtrees\Module\HtmlBlockModule;
-use Fisharebest\Webtrees\Module\ModuleCustomInterface;
-use Fisharebest\Webtrees\Module\ModuleBlockInterface;
-use Fisharebest\Webtrees\Module\ModuleGlobalInterface;
-use Fisharebest\Webtrees\Module\ModuleCustomTrait;
-use Fisharebest\Webtrees\Module\ModuleBlockTrait;
-use Fisharebest\Webtrees\Module\ModuleGlobalTrait;
-use Fisharebest\Webtrees\Module\ModuleServerRequestTrait;
-use Fisharebest\Webtrees\Services\HtmlService;
-use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Module\HtmlBlockModule;
+use Fisharebest\Webtrees\Module\ModuleBlockInterface;
+use Fisharebest\Webtrees\Module\ModuleBlockTrait;
+use Fisharebest\Webtrees\Module\ModuleCustomInterface;
+use Fisharebest\Webtrees\Module\ModuleCustomTrait;
+use Fisharebest\Webtrees\Module\ModuleGlobalInterface;
+use Fisharebest\Webtrees\Module\ModuleGlobalTrait;
+use Fisharebest\Webtrees\Services\HtmlService;
+use Fisharebest\Webtrees\Services\TreeService;
+use Fisharebest\Webtrees\Site;
+use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
-use Illuminate\Support\Str;
-use Psr\Http\Message\ServerRequestInterface;
 use Fisharebest\Webtrees\View;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Query\JoinClause;
-use Fisharebest\Webtrees\Services\TreeService;
-use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ServerRequestInterface;
 
+use function count;
+use function e;
 use function in_array;
-use function time;
+use function view;
 
-class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,ModuleBlockInterface, ModuleGlobalInterface
+class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, ModuleBlockInterface, ModuleGlobalInterface
 {
+    use ModuleBlockTrait;
     use ModuleCustomTrait;
     use ModuleGlobalTrait;
-    use ModuleBlockTrait;
 
-    public const CUSTOM_MODULE         = 'Family-Trees-List';
-    public const CUSTOM_GITHUB_USER = 'iyoua';
-    public const CUSTOM_WEBSITE          = 'https://github.com/' . self::CUSTOM_GITHUB_USER . '/' . self::CUSTOM_MODULE . '/';
-    public function customModuleLatestVersionUrl(): string { return 'https://github.com/iyoua/Family-Trees-List/blob/main/version.txt'; }
-        // Default values for new blocks.
-    private const DEFAULT_SORT = 'id_desc'; //默认排序方式：id
-    private const DEFAULT_STYLE = 'list';   //默认布局：列表
+    public const CUSTOM_MODULE = 'hh-family-trees-list';
+    public const CUSTOM_GITHUB_USER = 'hartenthaler';
+    public const CUSTOM_WEBSITE = 'https://github.com/' . self::CUSTOM_GITHUB_USER . '/' . self::CUSTOM_MODULE . '/';
+
+    private const DEFAULT_SORT = 'id_desc';
+    private const DEFAULT_STYLE = 'list';
 
     private TreeService $tree_service;
 
@@ -52,9 +51,14 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
         $this->tree_service = $tree_service;
     }
 
+    public function customModuleLatestVersionUrl(): string
+    {
+        return 'https://raw.githubusercontent.com/' . self::CUSTOM_GITHUB_USER . '/' . self::CUSTOM_MODULE . '/main/version.txt';
+    }
+
     public function resourcesFolder(): string
     {
-        return __DIR__ .  DIRECTORY_SEPARATOR .  'resources' .  DIRECTORY_SEPARATOR;
+        return __DIR__ . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR;
     }
 
     public function boot(): void
@@ -73,29 +77,30 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
         return '<link rel="stylesheet" href="' . e($this->assetUrl('css/treeslist.css')) . '">';
     }
 
-
     public function title(): string
     {
         /* I18N: Name of a module */
         return I18N::translate('Family tree list');
     }
 
-
     public function description(): string
-    {        
+    {
         return I18N::translate('List of family trees on this website');
-        
     }
 
     public function customModuleAuthorName(): string
     {
-        return 'iyoua';
+        return 'Hermann Hartenthaler';
     }
-    
 
     public function customModuleSupportUrl(): string
     {
         return self::CUSTOM_WEBSITE;
+    }
+
+    private function siteAllowsTreeList(): bool
+    {
+        return Site::getPreference('ALLOW_CHANGE_GEDCOM') === '1';
     }
 
     /**
@@ -129,23 +134,25 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
     /**
      * Count the number of events in each tree.
      *
-     * @return Collection<int,int>
+     * @return array<int,int>
      */
     private function totalEvents(): array
-        {
-        $allFiles = DB::table('gedcom')->select('gedcom_id')->distinct()->pluck('gedcom_id')->all();
-        $eventCounts = DB::table('dates')
-        ->select('d_file as gedcom_id', DB::raw('COUNT(*) as count'))
-        ->whereNotIn('d_fact', ['HEAD', 'CHAN'])
-        ->groupBy('d_file')
-        ->pluck('count', 'gedcom_id')
-        ->all();
-         $result = [];
-        foreach ($allFiles as $gedcomId) {
-           $result[$gedcomId] = $eventCounts[$gedcomId] ?? 0;
-         }
-        return $result;
+    {
+        $all_files = DB::table('gedcom')->select('gedcom_id')->distinct()->pluck('gedcom_id')->all();
+        $event_counts = DB::table('dates')
+            ->select('d_file as gedcom_id', DB::raw('COUNT(*) as count'))
+            ->whereNotIn('d_fact', ['HEAD', 'CHAN'])
+            ->groupBy('d_file')
+            ->pluck('count', 'gedcom_id')
+            ->all();
+
+        $result = [];
+        foreach ($all_files as $gedcom_id) {
+            $result[(int) $gedcom_id] = (int) ($event_counts[$gedcom_id] ?? 0);
         }
+
+        return $result;
+    }
 
     /**
      * Count the number of surnames in each tree.
@@ -163,217 +170,216 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface,M
 
     public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
-        $sortStyle = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
-        $sortedTrees = $this->tree_service->all(); // 假设返回的是一个Collection  
-        if ($sortStyle === 'id_desc') {
-            $sortedTrees = $sortedTrees->sortByDesc(function ($sortedTrees) {
-            return $sortedTrees->id(); // 假设 $tree->id() 是获取 ID 的公共方法
-            })->all();
+        if (!$this->siteAllowsTreeList()) {
+            return '';
         }
-                $content = view($infoStyle, [
-                    'block_id' =>$block_id,
-                    'all_trees'  => $sortedTrees,
-                    'individuals'=> $this->totalIndividuals(),
-                    'families'   => $this->totalFamilies(),
-                    'events'    => $this->totalEvents(),
-                    'surnames'  => $this->totalSurnames(),
-                    'treeicon' => $this->assetUrl('images/tree.png'),
-                    'familyicon' => $this->assetUrl('images/families.png'),
-                    'individualicon' => $this->assetUrl('images/person2.png'),
-                    'eventicon' => $this->assetUrl('images/event.png'),
-                    'surnameicon' => $this->assetUrl('images/sur.png'),
-                    'context' => $context,
-                ]);
+
+        $info_style = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
+        $sort_style = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
+        if (!in_array($info_style, array_keys($this->infoStyles()), true)) {
+            $info_style = self::DEFAULT_STYLE;
+        }
+
+        $sorted_trees = $this->tree_service->all();
+        if ($sort_style === 'id_asc') {
+            $sorted_trees = $sorted_trees->sortBy(static fn (Tree $tree): int => $tree->id());
+        } else {
+            $sorted_trees = $sorted_trees->sortByDesc(static fn (Tree $tree): int => $tree->id());
+        }
+
+        $content = view($info_style, [
+            'block_id' => $block_id,
+            'all_trees' => $sorted_trees->all(),
+            'individuals' => $this->totalIndividuals(),
+            'families' => $this->totalFamilies(),
+            'events' => $this->totalEvents(),
+            'surnames' => $this->totalSurnames(),
+            'treeicon' => $this->assetUrl('images/tree.png'),
+            'familyicon' => $this->assetUrl('images/families.png'),
+            'individualicon' => $this->assetUrl('images/person2.png'),
+            'eventicon' => $this->assetUrl('images/event.png'),
+            'surnameicon' => $this->assetUrl('images/sur.png'),
+            'context' => $context,
+        ]);
 
         if ($context !== ModuleBlockInterface::CONTEXT_EMBED) {
-            $totaltrees=$this->tree_service->all()->count();
+            $total_trees = $sorted_trees->count();
+            $title = I18N::plural('There is one family tree on this website', 'This website has %d family trees', $total_trees, $total_trees);
 
-            $title=I18N::plural('There is one family tree on this website',  'This website has %d family trees',$totaltrees, $totaltrees);
             return view('modules/block-template', [
-                'block'      => Str::kebab($this->name()),
-                'id'         => $block_id,
+                'block' => Str::kebab($this->name()),
+                'id' => $block_id,
                 'config_url' => $this->configUrl($tree, $context, $block_id),
-                'title'      => $title,
-                'content'    => $content,
+                'title' => $title,
+                'content' => $content,
             ]);
         }
 
         return $content;
     }
 
-
     public function loadAjax(): bool
     {
         return false;
     }
-   
 
-    /**
-     * Can this block be shown on the user’s home page?
-     *
-     * @return bool
-     */
     public function isUserBlock(): bool
     {
         return true;
     }
 
-    /**
-     * Can this block be shown on the tree’s home page?
-     *
-     * @return bool
-     */
     public function isTreeBlock(): bool
     {
         return true;
     }
-    
+
     public function customModuleVersion(): string
     {
-        return '2.2.6.0';
+        return '2.2.6.1';
     }
 
-
-    /**
-     * Update the configuration for a block.
-     *
-     * @param ServerRequestInterface $request
-     * @param int                    $block_id
-     *
-     * @return void
-     */
     public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
     {
-        $info_style = Validator::parsedBody($request)->string('infoStyle');   // 显示风格
-        $sort_style = Validator::parsedBody($request)->string('sortStyle');   // 排序，internal tree number
+        $info_style = Validator::parsedBody($request)->string('infoStyle', self::DEFAULT_STYLE);
+        $sort_style = Validator::parsedBody($request)->string('sortStyle', self::DEFAULT_SORT);
 
+        if (!in_array($info_style, array_keys($this->infoStyles()), true)) {
+            $info_style = self::DEFAULT_STYLE;
+        }
+
+        if (!in_array($sort_style, array_keys($this->sortStyles()), true)) {
+            $sort_style = self::DEFAULT_SORT;
+        }
 
         $this->setBlockSetting($block_id, 'infoStyle', $info_style);
         $this->setBlockSetting($block_id, 'sortStyle', $sort_style);
     }
 
-    /**
-     * An HTML form to edit block settings
-     *
-     * @param Tree $tree
-     * @param int  $block_id
-     *
-     * @return string
-     */
     public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-
-        $info_style = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
-        $sort_style = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
-
-        $info_styles = [
-            'list'  => I18N::translate('list'),
-            'table' => I18N::translate('table'),
-            'card' => I18N::translate('card'),
-            'capsule'=> I18N::translate('capsule'),
-            'navbar'=> I18N::translate('navbar'),
-        ];
-
-        $sort_styles = [
-            /* I18N: An option in a list-box */
-            'id_asc'  => I18N::translate('sort by internal tree number, oldest first'),
-            /* I18N: An option in a list-box */
-            'id_desc' => I18N::translate('sort by internal tree number, newest first'),
-        ];
-
         return view('config', [
-            'info_style'  => $info_style,
-            'info_styles' => $info_styles,
-            'sort_style'  => $sort_style,
-            'sort_styles' => $sort_styles,
+            'info_style' => $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE),
+            'info_styles' => $this->infoStyles(),
+            'sort_style' => $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT),
+            'sort_styles' => $this->sortStyles(),
         ]);
     }
 
-        public function customTranslations(string $language): array
+    /**
+     * @return array<string,string>
+     */
+    private function infoStyles(): array
     {
-        //  
-        switch ($language) {
-            case 'de':
-                return $this->germanTranslations();
-            case 'nl':
-                return $this->dutchTranslations();
-            case 'zh-Hans':
-                return $this->hansTranslations();
-            case 'zh-Hant':
-                return $this->hantTranslations();
-            default:
-                return [];
-        }
+        return [
+            'list' => I18N::translate('list'),
+            'table' => I18N::translate('table'),
+            'card' => I18N::translate('card'),
+            'capsule' => I18N::translate('capsule'),
+            'navbar' => I18N::translate('navbar'),
+        ];
     }
 
+    /**
+     * @return array<string,string>
+     */
+    private function sortStyles(): array
+    {
+        return [
+            'id_asc' => I18N::translate('sort by internal tree number, oldest first'),
+            'id_desc' => I18N::translate('sort by internal tree number, newest first'),
+        ];
+    }
+
+    public function customTranslations(string $language): array
+    {
+        return match ($language) {
+            'de' => $this->germanTranslations(),
+            'nl' => $this->dutchTranslations(),
+            'zh-Hans' => $this->hansTranslations(),
+            'zh-Hant' => $this->hantTranslations(),
+            default => [],
+        };
+    }
+
+    /**
+     * @return array<string,string>
+     */
     protected function germanTranslations(): array
     {
-        // Note the special characters used in plural and context-sensitive translations.
         return [
-            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => 'Es gibt einen Stammbaum auf dieser Website'. I18N::PLURAL .'Diese Website hat %d Stammbäume',
+            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => 'Es gibt einen Stammbaum auf dieser Website' . I18N::PLURAL . 'Diese Website hat %d Stammbäume',
             'Family tree list' => 'Stammbaum-Liste',
             'List of family trees on this website' => 'Stammbaumliste der Website',
+            'No family trees can be shown.' => 'Es können keine Stammbäume angezeigt werden.',
+            'Events' => 'Ereignisse',
             'navbar' => 'Navigationsleiste',
-            'card'=>'Karten',
-            'capsule'=>'Plaketten',
-            'sort by internal tree number, oldest first'=>'Sortieren nach interner Stammbaum-Nummer, älteste zuerst',
-            'sort by internal tree number, newest first'=>'Sortieren nach interner Stammbaum-Nummer, neueste zuerst',
-            '*Click on the header to sort the values.'=>'*Klicken Sie auf die Kopfzeile, um die Werte zu sortieren.',
+            'card' => 'Karten',
+            'capsule' => 'Plaketten',
+            'sort by internal tree number, oldest first' => 'Sortieren nach interner Stammbaum-Nummer, älteste zuerst',
+            'sort by internal tree number, newest first' => 'Sortieren nach interner Stammbaum-Nummer, neueste zuerst',
+            '*Click on the header to sort the values.' => '*Klicken Sie auf die Kopfzeile, um die Werte zu sortieren.',
         ];
     }
 
+    /**
+     * @return array<string,string>
+     */
     protected function dutchTranslations(): array
     {
-        // Note the special characters used in plural and context-sensitive translations.
         return [
-            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => 'Deze website heeft één stamboom'. I18N::PLURAL .'Deze website heeft %d stambomen',
+            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => 'Deze website heeft één stamboom' . I18N::PLURAL . 'Deze website heeft %d stambomen',
             'Family tree list' => 'Stamboomlijst',
             'List of family trees on this website' => 'Lijst van stambomen op website',
-            'table'=>'tabel',
-            'card'=>'kaarten',
-            'capsule'=>'labels',
+            'No family trees can be shown.' => 'Er kunnen geen stambomen worden getoond.',
+            'table' => 'tabel',
+            'card' => 'kaarten',
+            'capsule' => 'labels',
             'navbar' => 'navigatiebalk',
-            'sort by internal tree number, oldest first'=>'sorteren op intern stamboomnummer, oudste eerst',
-            'sort by internal tree number, newest first'=>'sorteren op intern stamboomnummer, nieuwste eerst',
-            '*Click on the header to sort the values.'=>'*Klik op de koptekst om de waarden te sorteren',
+            'sort by internal tree number, oldest first' => 'sorteren op intern stamboomnummer, oudste eerst',
+            'sort by internal tree number, newest first' => 'sorteren op intern stamboomnummer, nieuwste eerst',
+            '*Click on the header to sort the values.' => '*Klik op de koptekst om de waarden te sorteren',
         ];
     }
 
-    protected function hansTranslations() : array
+    /**
+     * @return array<string,string>
+     */
+    protected function hansTranslations(): array
     {
-        // 
         return [
-            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => '本网站已收录%d部家谱',
+            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => '本网站已收录%d部家谱',
             'Family tree list' => '家谱列表',
             'List of family trees on this website' => '显示网站上的家谱列表',
-            'list'=>'列  表',
-            'table'=>'表  格',
-            'card'=>'卡  片',
-            'capsule'=>'胶  囊',
+            'No family trees can be shown.' => '没有可显示的家谱。',
+            'list' => '列  表',
+            'table' => '表  格',
+            'card' => '卡  片',
+            'capsule' => '胶  囊',
             'navbar' => '导航栏',
-            'sort by internal tree number, oldest first'=>'按内部家谱编号排序，正序',
-            'sort by internal tree number, newest first'=>'按内部家谱编号排序，倒序',
-            '*Click on the header to sort the values.'=>'*点击表头可对数值进行排序。',
+            'sort by internal tree number, oldest first' => '按内部家谱编号排序，正序',
+            'sort by internal tree number, newest first' => '按内部家谱编号排序，倒序',
+            '*Click on the header to sort the values.' => '*点击表头可对数值进行排序。',
         ];
     }
 
-    protected function hantTranslations() : array
+    /**
+     * @return array<string,string>
+     */
+    protected function hantTranslations(): array
     {
-        
         return [
-            'There is one family tree on this website'. I18N::PLURAL .'This website has %d family trees' => '本網站已收錄%d部家譜',
+            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => '本網站已收錄%d部家譜',
             'Family tree list' => '家譜列表',
             'List of family trees on this website' => '顯示網站上的家譜列表',
-            'list'=>'列  表',
-            'table'=>'表  格',
-            'card'=>'卡  片',
-            'capsule'=>'膠  囊',
-            'navbar' => '导航栏',
-            'sort by internal tree number, oldest first'=>'按內部家譜編號排序，最老優先',
-            'sort by internal tree number, newest first'=>'按內部家譜編號排序，最新優先',
-            '*Click on the header to sort the values.'=>'*點擊表頭可對數值進行排序。',
+            'No family trees can be shown.' => '沒有可顯示的家譜。',
+            'list' => '列  表',
+            'table' => '表  格',
+            'card' => '卡  片',
+            'capsule' => '膠  囊',
+            'navbar' => '導航欄',
+            'sort by internal tree number, oldest first' => '按內部家譜編號排序，最老優先',
+            'sort by internal tree number, newest first' => '按內部家譜編號排序，最新優先',
+            '*Click on the header to sort the values.' => '*點擊表頭可對數值進行排序。',
         ];
     }
-
 }

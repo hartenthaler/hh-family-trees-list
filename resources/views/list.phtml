@@ -1,34 +1,42 @@
 <?php
 
 declare(strict_types=1);
+
 namespace TreesListModule;
+
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
 
 ?>
+<div class="family-trees-list">
+    <?php if ($all_trees === []) : ?>
+        <div class="family-trees-list__empty"><?= I18N::translate('No family trees can be shown.') ?></div>
+    <?php endif ?>
 
-    <div class="container">
-        <?php foreach ($all_trees as $tree ) : ?>
-            <div class="child">
-                <a href="<? echo e(route(TreePage::class,['tree'=>$tree->name()])); ?>">
-                    <b><?= e($tree->title()) ?></b></a>
-                <hr  class="custom-height">
-                <div class="number">
-                <div>
-                <img src="<?=e($familyicon)?>" title="<?php echo I18N::translate("Families"); ?>" class="zoom">
-                    <?= I18N::number(intval($families[$tree->id()])) ?></div>
-                    <div>
-                <img src="<?=e($individualicon)?>" title="<?php echo I18N::translate("Individuals"); ?>" class="zoom">
-                    <?=  I18N::number(intval($individuals[$tree->id()])) ?></div>
-                <div>
-				<img src="<?=e($eventicon)?>" title="<?php echo I18N::translate("Events"); ?>" class="zoom">
-                    <?=  I18N::number(intval($events[$tree->id()])) ?></div>
-                    <div>
-                <img src="<?=e($surnameicon)?>" title="<?php echo I18N::translate("Surnames"); ?>" class="zoom">
-				    <?=  I18N::number(intval($surnames[$tree->id()])) ?></div>
-                
-				</div>
-            </div>
+    <div class="family-trees-list__compact-grid">
+        <?php foreach ($all_trees as $tree) : ?>
+            <?php
+            $tree_id = $tree->id();
+            $stats = [
+                ['icon' => $familyicon, 'label' => I18N::translate('Families'), 'value' => (int) ($families[$tree_id] ?? 0)],
+                ['icon' => $individualicon, 'label' => I18N::translate('Individuals'), 'value' => (int) ($individuals[$tree_id] ?? 0)],
+                ['icon' => $eventicon, 'label' => I18N::translate('Events'), 'value' => (int) ($events[$tree_id] ?? 0)],
+                ['icon' => $surnameicon, 'label' => I18N::translate('Surnames'), 'value' => (int) ($surnames[$tree_id] ?? 0)],
+            ];
+            ?>
+            <article class="family-trees-list__list-item">
+                <a class="family-trees-list__title" href="<?= e(route(TreePage::class, ['tree' => $tree->name()])) ?>">
+                    <?= e($tree->title()) ?>
+                </a>
+                <div class="family-trees-list__stats">
+                    <?php foreach ($stats as $stat) : ?>
+                        <span class="family-trees-list__stat" title="<?= e($stat['label']) ?>">
+                            <span class="family-trees-list__stat-label"><img src="<?= e($stat['icon']) ?>" alt=""> <span class="visually-hidden"><?= e($stat['label']) ?></span></span>
+                            <span class="family-trees-list__stat-value"><?= I18N::number($stat['value']) ?></span>
+                        </span>
+                    <?php endforeach ?>
+                </div>
+            </article>
         <?php endforeach ?>
-
     </div>
+</div>

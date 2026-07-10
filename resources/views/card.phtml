@@ -1,88 +1,43 @@
 <?php
 
 declare(strict_types=1);
+
 namespace TreesListModule;
+
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
 
 ?>
-<style>
-            /* 父容器样式 */
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            padding: 0px; /* 设置内部填充来创建边距 */
-            border: 0px solid black;
-            width: 100%;
-        }
+<div class="family-trees-list">
+    <?php if ($all_trees === []) : ?>
+        <div class="family-trees-list__empty"><?= I18N::translate('No family trees can be shown.') ?></div>
+    <?php endif ?>
 
-         .hr.custom-height {
-            height: 1; /* 设置线条高度 */
-            border: none; /* 移除默认边框 */
-             /* background-color: black;设置线条颜色 */
-            border-top: 1px dashed #000; /* 虚线样式<br>颜色为黑色 */
-            margin: 3px 0; /* 设置线条上下外边距 */
-        }
-.zoom {
-    transition: transform 0.3s; /* 设置过渡效果 */
-       filter: none; 
-}
-
-.zoom:hover {
-    transform: scale(1.2); /* 鼠标经过时放大1.2倍 */
-       filter: none; 
-}
-  .card1 {  
-    min-width: 160px; /* min-width: 300px;设置子容器的最小宽度 */
-    border: 1px solid #ccc;  
-    border-radius: 5px;  
-    margin-bottom: 5px;  
-                margin-bottom: 8px; /* 设置垂直外边距 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-            transition: transform 0.3s ease; /* 添加过渡效果 */
-    /*overflow: hidden;  */
-  }  
-          /* 鼠标经过子容器时的样式 */
-        .card1:hover {
-             transform: translateY(-3px); /* 向上移动子容器 */
-             box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* 增加阴影效果 */}
-    
-  .card1-header {  
-    background-color: #f2f2f2;  
-    padding: 10px;  
-  }  
-    
-
-  .card1-body {  
-    padding: 10px;  
-    height: auto;  
-    overflow: hidden;
-    transition: height 0.3s ease-out;  
-  }  
-    
-
-</style>
-  <div class="container">
-        <?php foreach ($all_trees as $tree ) : ?>
-            <div class="card1 col-sm-4">
-                <div class='card-header'>
-                  <a href="<? echo e(route(TreePage::class,['tree'=>$tree->name()])); ?>">
-                    <img src="<? echo e($treeicon) ?>" class="zoom">
-                    <b><? echo e($tree->title()) ?></b>
-                  </a>
+    <div class="family-trees-list__grid">
+        <?php foreach ($all_trees as $tree) : ?>
+            <?php
+            $tree_id = $tree->id();
+            $stats = [
+                ['icon' => $familyicon, 'label' => I18N::translate('Families'), 'value' => (int) ($families[$tree_id] ?? 0)],
+                ['icon' => $individualicon, 'label' => I18N::translate('Individuals'), 'value' => (int) ($individuals[$tree_id] ?? 0)],
+                ['icon' => $eventicon, 'label' => I18N::translate('Events'), 'value' => (int) ($events[$tree_id] ?? 0)],
+                ['icon' => $surnameicon, 'label' => I18N::translate('Surnames'), 'value' => (int) ($surnames[$tree_id] ?? 0)],
+            ];
+            ?>
+            <article class="family-trees-list__card">
+                <a class="family-trees-list__title" href="<?= e(route(TreePage::class, ['tree' => $tree->name()])) ?>">
+                    <img src="<?= e($treeicon) ?>" alt="">
+                    <?= e($tree->title()) ?>
+                </a>
+                <div class="family-trees-list__stats">
+                    <?php foreach ($stats as $stat) : ?>
+                        <span class="family-trees-list__stat">
+                            <span class="family-trees-list__stat-label"><img src="<?= e($stat['icon']) ?>" alt=""> <?= e($stat['label']) ?></span>
+                            <span class="family-trees-list__stat-value"><?= I18N::number($stat['value']) ?></span>
+                        </span>
+                    <?php endforeach ?>
                 </div>
-                <div class="card-body">
-                      <?php echo I18N::translate("Families"); ?>:
-                         <?= I18N::number(intval($families[$tree->id()])) ?><br>
-                      <?php echo I18N::translate("Individuals"); ?>:
-                        <?=  I18N::number(intval($individuals[$tree->id()])) ?><br>
-				      <?php echo I18N::translate("Events"); ?>:
-                        <?=  I18N::number(intval($events[$tree->id()])) ?><br>
-                      <?php echo I18N::translate("Surnames"); ?>:
-				        <?=  I18N::number(intval($surnames[$tree->id()])) ?>
-                </div>
-            </div>
+            </article>
         <?php endforeach ?>
-              
+    </div>
 </div>

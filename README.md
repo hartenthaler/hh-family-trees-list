@@ -1,74 +1,83 @@
-Family-Trees-List module for webtrees
-=====================================
-*Family-Trees-List* is a webtrees module for displaying an overview of all family trees on a website.
+# Family Trees List for webtrees
 
-### Screenshots
+`hh-family-trees-list` is a webtrees 2.2 module that displays a compact overview of the family trees on a website.
 
-![capsule](https://github.com/iyoua/Family-Trees-List/assets/102014216/8fce766b-5641-4c15-95b2-6f0ba1f9d937)
-![cards](https://github.com/iyoua/Family-Trees-List/assets/102014216/ff239166-3b00-47f6-b609-8242953b7b98)
-![list](https://github.com/iyoua/Family-Trees-List/assets/102014216/4c94f5cd-2499-43e9-bcf7-4986d9a691b3)
-![navbar](https://github.com/iyoua/Family-Trees-List/assets/102014216/898d7eec-e9e4-410d-8d33-406227eed23d)
-![table](https://github.com/iyoua/Family-Trees-List/assets/102014216/666f99c7-7851-4500-8539-94772042e8ac)
+It is maintained as a modernized fork of the original **Family-Trees-List** module by iyoua.
 
-On the website home page, this module displays a list of family trees with statistical data for each tree, such as:
-1. total number of families,
-2. total number of individuals,
-3. total number of surnames,
-4. total number of events.
+## 📌 Purpose
 
-Install
-----------
-After downloading and extracting the module, upload it to the webtrees `modules_v4` folder.
-The module folder must be named `family-trees-list`.
+The module adds a configurable block for user and tree home pages. It can show all family trees on the website together with useful summary figures:
 
-Version update
----------------
-With the help of GREG and HERMANN, the module has become increasingly mature. I would like to thank them for their support.
+- families
+- individuals
+- events
+- surnames
 
-### 1.2.1 Version Upgrade
+The module respects the global webtrees setting **Show list of family trees**. If this webtrees setting is disabled, the block does not render a family tree list.
 
-1. Added statistics on the total number of family trees;
-2. Revised the list layout to accommodate longer family tree names;
-3. Modified the settings of user page blocks.
+## ✨ Features
 
+- five display styles: list, table, card, capsule, and navbar
+- sortable table view
+- responsive layouts for desktop and mobile screens
+- statistics for each family tree
+- block configuration for layout and sort order
+- custom translations for German, Dutch, Simplified Chinese, and Traditional Chinese
 
-### 1.3.0 Version Update
+## 🧩 Installation
 
-1. Added block setting function;
-2. Three display styles have been added;
-3. Simplified prompt information and removed too many translation entries.
+### Installation with the Custom Module Manager
 
+If the module is available through the Custom Module Manager, install it there and enable it in the webtrees control panel.
 
-### 1.3.2 Version Update
+### Manual installation
 
-1. Fixed statistical errors in the number of events.
-2. Revised some translation entries.
-3. Added display style.
+1. Download the release ZIP file from GitHub.
+2. Extract it into the webtrees `modules_v4` folder.
+3. The folder name must be:
 
+   ```text
+   hh-family-trees-list
+   ```
 
-### 1.3.3 Version Update
+4. Enable the module in the webtrees control panel.
+5. Add the block to the desired home page.
 
-1. Fixed several errors
-2. Added sorting of family tree data
+## ⚙️ Configuration
 
+Each block can be configured separately:
 
-### 1.3.4 Version Update
+- **Layout**: list, table, card, capsule, or navbar
+- **Sort order**: internal tree number, oldest first or newest first
 
-1. Fixed the issue of array index errors after the statistical result was 0
+The module also follows the global webtrees setting:
 
+- **Website preferences → Show list of family trees**
 
-### 1.3.5 Version Update
+If this option is set to **no**, the module suppresses the family tree list.
 
-1. Updated German translation
-2. Fixed the issue of automatic activation of the soft keyboard caused by CSS
-3. Corrected some non-standard grammar
+## 🖼️ Display Styles
 
+The maintained fork keeps the original idea of several compact display styles, but uses a shared responsive stylesheet.
 
-### 2.2.6.0 Version Update
+- **List**: compact tiles with statistics
+- **Card**: larger cards for more visual separation
+- **Capsule**: one row per tree with pill-shaped counters
+- **Navbar**: a narrow row layout for dense pages
+- **Table**: sortable table with all values
 
-1. Updated the module for compatibility with webtrees 2.2.6.
-2. Replaced the deprecated `app()` helper with the webtrees registry container.
-3. Replaced the undefined block context constant with the explicit webtrees block context.
-4. Improved English user interface texts and clarified that sorting uses the internal tree number.
-5. Documented the required lowercase module folder name `family-trees-list`.
-6. Fixed responsive layouts on narrow screens, especially clipped numbers in the capsule display. This resolves issue #12.
+## 🔧 Compatibility
+
+This fork targets webtrees 2.2.x.
+
+## 🤝 Credits
+
+This module is based on the original **Family-Trees-List** module by **iyoua**.
+
+Thanks to the original developer for the idea and the first implementation.
+
+The maintained `hh-family-trees-list` fork includes compatibility, documentation, and design updates by Hermann Hartenthaler with assistance from Codex.
+
+## 📄 License
+
+This module follows the license of the original project.

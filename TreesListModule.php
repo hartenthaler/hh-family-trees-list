@@ -64,7 +64,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
     public function customModuleLatestVersionUrl(): string
     {
-        return 'https://raw.githubusercontent.com/' . self::CUSTOM_GITHUB_USER . '/' . self::CUSTOM_MODULE . '/main/version.txt';
+        return 'https://raw.githubusercontent.com/' . self::CUSTOM_GITHUB_USER . '/' . self::CUSTOM_MODULE . '/main/latest-version.txt';
     }
 
     public function resourcesFolder(): string

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TreesListModule;
+namespace Hartenthaler\Webtrees\Module\FamilyTreesList\Internationalization;
 
 use Fisharebest\Webtrees\I18N;
 

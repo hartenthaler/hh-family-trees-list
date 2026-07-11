@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TreesListModule;
+namespace Hartenthaler\Webtrees\Module\FamilyTreesList;
 
 use Fisharebest\Localization\Translation;
 use Fisharebest\Webtrees\FlashMessages;
@@ -22,6 +22,7 @@ use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Validator;
 use Fisharebest\Webtrees\View;
+use Hartenthaler\Webtrees\Module\FamilyTreesList\Internationalization\MoreI18N;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;

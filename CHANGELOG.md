@@ -2,6 +2,12 @@
 
 ## Next release
 
+- Added a per-tree research-purpose setting based on the purpose categories used by `hh_legal_notice`.
+- Added the research purpose `Test` and the public `researchPurpose(Tree $tree)` integration method.
+- Documented the public research-purpose API, including optional module integration and the broader meaning of genealogical test data.
+- Added per-block field selection for research purpose, families, individuals, events, and surnames while keeping the family-tree name mandatory.
+- Preserved the existing set of statistics as the default for existing and new blocks; the new research-purpose field is opt-in.
+- Documented why the structured purpose is stored as a tree preference rather than overwriting a GEDCOM `HEAD:NOTE`.
 - Renamed the maintained fork to `hh-family-trees-list`.
 - Respect the global webtrees setting **Show list of family trees** (`ALLOW_CHANGE_GEDCOM`); if the setting is disabled, the block does not render a family tree list.
 - Modernized all display variants with shared CSS, responsive layouts, fewer inline styles, and more robust handling of missing statistics.

@@ -17,17 +17,25 @@ use Fisharebest\Webtrees\I18N;
         <?php foreach ($all_trees as $tree) : ?>
             <?php
             $tree_id = $tree->id();
-            $stats = [
-                ['icon' => $familyicon, 'label' => I18N::translate('Families'), 'value' => (int) ($families[$tree_id] ?? 0)],
-                ['icon' => $individualicon, 'label' => I18N::translate('Individuals'), 'value' => (int) ($individuals[$tree_id] ?? 0)],
-                ['icon' => $eventicon, 'label' => I18N::translate('Events'), 'value' => (int) ($events[$tree_id] ?? 0)],
-                ['icon' => $surnameicon, 'label' => I18N::translate('Surnames'), 'value' => (int) ($surnames[$tree_id] ?? 0)],
-            ];
+            $stats = [];
+            foreach ([
+                'families' => [$familyicon, I18N::translate('Families'), $families],
+                'individuals' => [$individualicon, I18N::translate('Individuals'), $individuals],
+                'events' => [$eventicon, I18N::translate('Events'), $events],
+                'surnames' => [$surnameicon, I18N::translate('Surnames'), $surnames],
+            ] as $key => [$icon, $label, $values]) {
+                if (isset($visible_fields[$key])) {
+                    $stats[] = ['icon' => $icon, 'label' => $label, 'value' => (int) ($values[$tree_id] ?? 0)];
+                }
+            }
             ?>
             <article class="family-trees-list__list-item">
                 <a class="family-trees-list__title" href="<?= e(route(TreePage::class, ['tree' => $tree->name()])) ?>">
                     <?= e($tree->title()) ?>
                 </a>
+                <?php if (isset($visible_fields['purpose']) && ($purposes[$tree_id] ?? '') !== '') : ?>
+                    <div class="family-trees-list__purpose"><?= e($purposes[$tree_id]) ?></div>
+                <?php endif ?>
                 <div class="family-trees-list__stats">
                     <?php foreach ($stats as $stat) : ?>
                         <span class="family-trees-list__stat" title="<?= e($stat['label']) ?>">

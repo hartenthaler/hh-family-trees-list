@@ -16,18 +16,26 @@ use Fisharebest\Webtrees\I18N;
     <?php foreach ($all_trees as $tree) : ?>
         <?php
         $tree_id = $tree->id();
-        $stats = [
-            ['icon' => $familyicon, 'label' => I18N::translate('Families'), 'value' => (int) ($families[$tree_id] ?? 0)],
-            ['icon' => $individualicon, 'label' => I18N::translate('Individuals'), 'value' => (int) ($individuals[$tree_id] ?? 0)],
-            ['icon' => $eventicon, 'label' => I18N::translate('Events'), 'value' => (int) ($events[$tree_id] ?? 0)],
-            ['icon' => $surnameicon, 'label' => I18N::translate('Surnames'), 'value' => (int) ($surnames[$tree_id] ?? 0)],
-        ];
+        $stats = [];
+        foreach ([
+            'families' => [$familyicon, I18N::translate('Families'), $families],
+            'individuals' => [$individualicon, I18N::translate('Individuals'), $individuals],
+            'events' => [$eventicon, I18N::translate('Events'), $events],
+            'surnames' => [$surnameicon, I18N::translate('Surnames'), $surnames],
+        ] as $key => [$icon, $label, $values]) {
+            if (isset($visible_fields[$key])) {
+                $stats[] = ['icon' => $icon, 'label' => $label, 'value' => (int) ($values[$tree_id] ?? 0)];
+            }
+        }
         ?>
         <div class="family-trees-list__capsule-row">
             <a class="family-trees-list__capsule family-trees-list__capsule--title" href="<?= e(route(TreePage::class, ['tree' => $tree->name()])) ?>">
                 <img src="<?= e($treeicon) ?>" alt="">
                 <strong><?= e($tree->title()) ?></strong>
             </a>
+            <?php if (isset($visible_fields['purpose']) && ($purposes[$tree_id] ?? '') !== '') : ?>
+                <span class="family-trees-list__capsule family-trees-list__purpose"><?= e($purposes[$tree_id]) ?></span>
+            <?php endif ?>
             <?php foreach ($stats as $stat) : ?>
                 <span class="family-trees-list__capsule" title="<?= e($stat['label']) ?>">
                     <img src="<?= e($stat['icon']) ?>" alt="">

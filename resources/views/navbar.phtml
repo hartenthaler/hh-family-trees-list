@@ -16,17 +16,25 @@ use Fisharebest\Webtrees\I18N;
     <?php foreach ($all_trees as $tree) : ?>
         <?php
         $tree_id = $tree->id();
-        $stats = [
-            ['label' => I18N::translate('Families'), 'value' => (int) ($families[$tree_id] ?? 0)],
-            ['label' => I18N::translate('Individuals'), 'value' => (int) ($individuals[$tree_id] ?? 0)],
-            ['label' => I18N::translate('Events'), 'value' => (int) ($events[$tree_id] ?? 0)],
-            ['label' => I18N::translate('Surnames'), 'value' => (int) ($surnames[$tree_id] ?? 0)],
-        ];
+        $stats = [];
+        foreach ([
+            'families' => [I18N::translate('Families'), $families],
+            'individuals' => [I18N::translate('Individuals'), $individuals],
+            'events' => [I18N::translate('Events'), $events],
+            'surnames' => [I18N::translate('Surnames'), $surnames],
+        ] as $key => [$label, $values]) {
+            if (isset($visible_fields[$key])) {
+                $stats[] = ['label' => $label, 'value' => (int) ($values[$tree_id] ?? 0)];
+            }
+        }
         ?>
         <div class="family-trees-list__navbar-row">
             <a class="family-trees-list__navbar-title" href="<?= e(route(TreePage::class, ['tree' => $tree->name()])) ?>">
                 <strong><?= e($tree->title()) ?></strong>
             </a>
+            <?php if (isset($visible_fields['purpose']) && ($purposes[$tree_id] ?? '') !== '') : ?>
+                <span class="family-trees-list__navbar-purpose"><?= e($purposes[$tree_id]) ?></span>
+            <?php endif ?>
             <?php foreach ($stats as $stat) : ?>
                 <span class="family-trees-list__navbar-stat" title="<?= e($stat['label']) ?>">
                     <?= I18N::number($stat['value']) ?>

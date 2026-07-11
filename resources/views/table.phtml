@@ -23,10 +23,28 @@ use Fisharebest\Webtrees\I18N;
                                 <?= I18N::translate('Family tree') ?>
                             </button>
                         </th>
-                        <?php foreach ([['icon' => $familyicon, 'label' => I18N::translate('Families')], ['icon' => $individualicon, 'label' => I18N::translate('Individuals')], ['icon' => $eventicon, 'label' => I18N::translate('Events')], ['icon' => $surnameicon, 'label' => I18N::translate('Surnames')]] as $index => $column) : ?>
+                        <?php
+                        $columns = [];
+                        if (isset($visible_fields['purpose'])) {
+                            $columns[] = ['key' => 'purpose', 'icon' => null, 'label' => I18N::translate('Research purpose')];
+                        }
+                        foreach ([
+                            'families' => [$familyicon, I18N::translate('Families')],
+                            'individuals' => [$individualicon, I18N::translate('Individuals')],
+                            'events' => [$eventicon, I18N::translate('Events')],
+                            'surnames' => [$surnameicon, I18N::translate('Surnames')],
+                        ] as $key => [$icon, $label]) {
+                            if (isset($visible_fields[$key])) {
+                                $columns[] = ['key' => $key, 'icon' => $icon, 'label' => $label];
+                            }
+                        }
+                        ?>
+                        <?php foreach ($columns as $index => $column) : ?>
                             <th>
                                 <button class="family-trees-list__sort-button" type="button" data-family-trees-list-sort="<?= $index + 1 ?>">
-                                    <img class="family-trees-list__table-icon" src="<?= e($column['icon']) ?>" alt="">
+                                    <?php if ($column['icon'] !== null) : ?>
+                                        <img class="family-trees-list__table-icon" src="<?= e($column['icon']) ?>" alt="">
+                                    <?php endif ?>
                                     <?= e($column['label']) ?>
                                 </button>
                             </th>
@@ -42,10 +60,14 @@ use Fisharebest\Webtrees\I18N;
                                     <strong><?= e($tree->title()) ?></strong>
                                 </a>
                             </td>
-                            <td data-sort="<?= (int) ($families[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($families[$tree_id] ?? 0)) ?></td>
-                            <td data-sort="<?= (int) ($individuals[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($individuals[$tree_id] ?? 0)) ?></td>
-                            <td data-sort="<?= (int) ($events[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($events[$tree_id] ?? 0)) ?></td>
-                            <td data-sort="<?= (int) ($surnames[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($surnames[$tree_id] ?? 0)) ?></td>
+                            <?php foreach ($columns as $column) : ?>
+                                <?php if ($column['key'] === 'purpose') : ?>
+                                    <td data-sort="<?= e($purposes[$tree_id] ?? '') ?>"><?= e($purposes[$tree_id] ?? '') ?></td>
+                                <?php else : ?>
+                                    <?php $values = ${$column['key']}; ?>
+                                    <td data-sort="<?= (int) ($values[$tree_id] ?? 0) ?>"><?= I18N::number((int) ($values[$tree_id] ?? 0)) ?></td>
+                                <?php endif ?>
+                            <?php endforeach ?>
                         </tr>
                     <?php endforeach ?>
                 </tbody>

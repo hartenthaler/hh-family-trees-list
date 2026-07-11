@@ -2,6 +2,7 @@
 
 ## Next release
 
+- Standardized the PHP namespace as `Hartenthaler\Webtrees\Module\FamilyTreesList` and moved the internationalization helper into its dedicated sub-namespace.
 - Replaced the legacy PHP translation arrays with gettext PO/MO catalogs and kept webtrees core strings outside the module catalog through `MoreI18N`.
 - Added translation credits for German, Dutch, Simplified Chinese, and Traditional Chinese.
 - Added a per-tree research-purpose setting based on the purpose categories used by `hh_legal_notice`.

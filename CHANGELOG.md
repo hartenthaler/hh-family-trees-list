@@ -1,5 +1,7 @@
 # Change Log
 
+## Next release
+
 ## 2.2.6.2
 
 - Restricted block configuration to site administrators while retaining the regular per-block visibility rules for its presentation.

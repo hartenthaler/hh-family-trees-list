@@ -2,6 +2,7 @@
 
 ## Next release
 
+- Replaced the legacy PHP translation arrays with gettext PO/MO catalogs and kept webtrees core strings outside the module catalog through `MoreI18N`.
 - Added a per-tree research-purpose setting based on the purpose categories used by `hh_legal_notice`.
 - Added the research purpose `Test` and the public `researchPurpose(Tree $tree)` integration method.
 - Documented the public research-purpose API, including optional module integration and the broader meaning of genealogical test data.

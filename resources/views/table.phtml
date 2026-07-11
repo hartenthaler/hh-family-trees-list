@@ -6,6 +6,7 @@ namespace TreesListModule;
 
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
+use TreesListModule\MoreI18N;
 
 ?>
 <div class="family-trees-list">
@@ -20,7 +21,7 @@ use Fisharebest\Webtrees\I18N;
                         <th>
                             <button class="family-trees-list__sort-button" type="button" data-family-trees-list-sort="0">
                                 <img class="family-trees-list__table-icon" src="<?= e($treeicon) ?>" alt="">
-                                <?= I18N::translate('Family tree') ?>
+                                <?= MoreI18N::xlate('Family tree') ?>
                             </button>
                         </th>
                         <?php
@@ -29,10 +30,10 @@ use Fisharebest\Webtrees\I18N;
                             $columns[] = ['key' => 'purpose', 'icon' => null, 'label' => I18N::translate('Research purpose')];
                         }
                         foreach ([
-                            'families' => [$familyicon, I18N::translate('Families')],
-                            'individuals' => [$individualicon, I18N::translate('Individuals')],
-                            'events' => [$eventicon, I18N::translate('Events')],
-                            'surnames' => [$surnameicon, I18N::translate('Surnames')],
+                            'families' => [$familyicon, MoreI18N::xlate('Families')],
+                            'individuals' => [$individualicon, MoreI18N::xlate('Individuals')],
+                            'events' => [$eventicon, MoreI18N::xlate('Events')],
+                            'surnames' => [$surnameicon, MoreI18N::xlate('Surnames')],
                         ] as $key => [$icon, $label]) {
                             if (isset($visible_fields[$key])) {
                                 $columns[] = ['key' => $key, 'icon' => $icon, 'label' => $label];

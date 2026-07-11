@@ -12,6 +12,7 @@ use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\HtmlService;
 use Fisharebest\Webtrees\Services\TreeService;
 
+require __DIR__ . '/MoreI18N.php';
 require __DIR__ . '/TreesListModule.php';
 
 return new TreesListModule(

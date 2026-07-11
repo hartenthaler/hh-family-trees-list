@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TreesListModule;
 
+use Fisharebest\Localization\Translation;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\HtmlBlockModule;
@@ -30,6 +31,7 @@ use Psr\Http\Message\ResponseInterface;
 
 use function count;
 use function e;
+use function file_exists;
 use function in_array;
 use function redirect;
 use function view;
@@ -323,10 +325,10 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
     {
         return [
             'purpose' => I18N::translate('Research purpose'),
-            'families' => I18N::translate('Families'),
-            'individuals' => I18N::translate('Individuals'),
-            'events' => I18N::translate('Events'),
-            'surnames' => I18N::translate('Surnames'),
+            'families' => MoreI18N::xlate('Families'),
+            'individuals' => MoreI18N::xlate('Individuals'),
+            'events' => MoreI18N::xlate('Events'),
+            'surnames' => MoreI18N::xlate('Surnames'),
         ];
     }
 
@@ -395,110 +397,8 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
     public function customTranslations(string $language): array
     {
-        return match ($language) {
-            'de' => $this->germanTranslations(),
-            'nl' => $this->dutchTranslations(),
-            'zh-Hans' => $this->hansTranslations(),
-            'zh-Hant' => $this->hantTranslations(),
-            default => [],
-        };
-    }
+        $file = $this->resourcesFolder() . 'lang' . DIRECTORY_SEPARATOR . $language . '.mo';
 
-    /**
-     * @return array<string,string>
-     */
-    protected function germanTranslations(): array
-    {
-        return [
-            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => 'Es gibt einen Stammbaum auf dieser Website' . I18N::PLURAL . 'Diese Website hat %d Stammbäume',
-            'Family tree list' => 'Stammbaum-Liste',
-            'List of family trees on this website' => 'Stammbaumliste der Website',
-            'No family trees can be shown.' => 'Es können keine Stammbäume angezeigt werden.',
-            'Events' => 'Ereignisse',
-            'navbar' => 'Navigationsleiste',
-            'card' => 'Karten',
-            'capsule' => 'Plaketten',
-            'sort by internal tree number, oldest first' => 'Sortieren nach interner Stammbaum-Nummer, älteste zuerst',
-            'sort by internal tree number, newest first' => 'Sortieren nach interner Stammbaum-Nummer, neueste zuerst',
-            '*Click on the header to sort the values.' => '*Klicken Sie auf die Kopfzeile, um die Werte zu sortieren.',
-            'Research purpose' => 'Forschungszweck',
-            'Not specified' => 'Nicht festgelegt',
-            'Family and ancestry research' => 'Familien- und Ahnenforschung',
-            'One-name study' => 'Namensträgerstudie',
-            'One-place study or local family book' => 'Ortsstudie oder Ortsfamilienbuch',
-            'Farm and farmstead research' => 'Höfeforschung',
-            'Thematic research' => 'Themenbezogene Forschung',
-            'Migration research' => 'Migrationsforschung',
-            'Community research' => 'Gemeinschaftsforschung',
-            'Test' => 'Test',
-            'Displayed fields' => 'Angezeigte Felder',
-            'The family tree name is always displayed.' => 'Der Name des Stammbaums wird immer angezeigt.',
-            'Research purposes of the family trees' => 'Forschungszwecke der Stammbäume',
-            'Select the main research purpose for each family tree. The value can optionally be displayed in this module\'s blocks.' => 'Wählen Sie für jeden Stammbaum den wichtigsten Forschungszweck. Der Wert kann optional in den Blöcken dieses Moduls angezeigt werden.',
-            'The research purposes of the family trees have been updated.' => 'Die Forschungszwecke der Stammbäume wurden aktualisiert.',
-            'The purpose is stored as a tree preference. Existing GEDCOM HEAD notes are not changed.' => 'Der Zweck wird als Einstellung des Stammbaums gespeichert. Vorhandene GEDCOM-HEAD-Notizen werden nicht verändert.',
-        ];
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    protected function dutchTranslations(): array
-    {
-        return [
-            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => 'Deze website heeft één stamboom' . I18N::PLURAL . 'Deze website heeft %d stambomen',
-            'Family tree list' => 'Stamboomlijst',
-            'List of family trees on this website' => 'Lijst van stambomen op website',
-            'No family trees can be shown.' => 'Er kunnen geen stambomen worden getoond.',
-            'table' => 'tabel',
-            'card' => 'kaarten',
-            'capsule' => 'labels',
-            'navbar' => 'navigatiebalk',
-            'sort by internal tree number, oldest first' => 'sorteren op intern stamboomnummer, oudste eerst',
-            'sort by internal tree number, newest first' => 'sorteren op intern stamboomnummer, nieuwste eerst',
-            '*Click on the header to sort the values.' => '*Klik op de koptekst om de waarden te sorteren',
-        ];
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    protected function hansTranslations(): array
-    {
-        return [
-            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => '本网站已收录%d部家谱',
-            'Family tree list' => '家谱列表',
-            'List of family trees on this website' => '显示网站上的家谱列表',
-            'No family trees can be shown.' => '没有可显示的家谱。',
-            'list' => '列  表',
-            'table' => '表  格',
-            'card' => '卡  片',
-            'capsule' => '胶  囊',
-            'navbar' => '导航栏',
-            'sort by internal tree number, oldest first' => '按内部家谱编号排序，正序',
-            'sort by internal tree number, newest first' => '按内部家谱编号排序，倒序',
-            '*Click on the header to sort the values.' => '*点击表头可对数值进行排序。',
-        ];
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    protected function hantTranslations(): array
-    {
-        return [
-            'There is one family tree on this website' . I18N::PLURAL . 'This website has %d family trees' => '本網站已收錄%d部家譜',
-            'Family tree list' => '家譜列表',
-            'List of family trees on this website' => '顯示網站上的家譜列表',
-            'No family trees can be shown.' => '沒有可顯示的家譜。',
-            'list' => '列  表',
-            'table' => '表  格',
-            'card' => '卡  片',
-            'capsule' => '膠  囊',
-            'navbar' => '導航欄',
-            'sort by internal tree number, oldest first' => '按內部家譜編號排序，最老優先',
-            'sort by internal tree number, newest first' => '按內部家譜編號排序，最新優先',
-            '*Click on the header to sort the values.' => '*點擊表頭可對數值進行排序。',
-        ];
+        return file_exists($file) ? (new Translation($file))->asArray() : [];
     }
 }

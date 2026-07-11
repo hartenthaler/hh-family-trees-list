@@ -1,17 +1,18 @@
 # Family Trees List for webtrees
 
+[![webtrees 2.2](https://img.shields.io/badge/webtrees-v2.2.x-green)](https://www.webtrees.net/)
+[![Latest release](https://img.shields.io/github/v/release/hartenthaler/hh-family-trees-list)](https://github.com/hartenthaler/hh-family-trees-list/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/hartenthaler/hh-family-trees-list/total)](https://github.com/hartenthaler/hh-family-trees-list/releases)
+
 `hh-family-trees-list` is a webtrees 2.2 module that displays a compact overview of the family trees on a website.
+
+Current module version: **2.2.6.2**.
 
 It is maintained as a modernized fork of the original **Family-Trees-List** module by iyoua.
 
 ## 📌 Purpose
 
-The module adds a configurable block that can be placed on a personal **My page** or on the home page of a family tree. It can show all family trees on the website together with useful summary figures:
-
-- families
-- individuals
-- events
-- surnames
+The module adds a configurable block that can be placed on a personal **My page** or on the home page of a family tree. It can show all family trees on the website together with useful information, for example their research purpose and summary figures for families, individuals, events, and surnames.
 
 The module respects the global webtrees setting **Show list of family trees**. The block is displayed only when this option is set to **yes** under **Control panel → Website preferences**. If it is disabled, visitors and other non-administrators see neither the block nor a hint that other family trees may exist. Administrators see a configuration hint instead.
 

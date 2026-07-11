@@ -255,7 +255,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
     public function customModuleVersion(): string
     {
-        return '2.2.6.1';
+        return '2.2.6.2';
     }
 
     public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void

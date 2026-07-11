@@ -1,10 +1,11 @@
 # Change Log
 
-## Next release
+## 2.2.6.2
 
 - Restricted block configuration to site administrators while retaining the regular per-block visibility rules for its presentation.
 - Added an administrator-only warning when the global **Show list of family trees** setting prevents the block from being displayed; visitors and other users continue to receive no tree-list information.
 - Clarified in the README that the block can be placed on a personal **My page** or a family-tree home page and may be shown to visitors according to its block visibility setting.
+- Added release and download badges and updated the README overview to describe the available information without presenting an incomplete field list.
 - Standardized the PHP namespace as `Hartenthaler\Webtrees\Module\FamilyTreesList` and moved the internationalization helper into its dedicated sub-namespace.
 - Replaced the legacy PHP translation arrays with gettext PO/MO catalogs and kept webtrees core strings outside the module catalog through `MoreI18N`.
 - Added translation credits for German, Dutch, Simplified Chinese, and Traditional Chinese.

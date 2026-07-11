@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
+use TreesListModule\MoreI18N;
 
 /**
  * @var string               $title
@@ -15,7 +16,7 @@ use Fisharebest\Webtrees\Tree;
 ?>
 
 <?= view('components/breadcrumbs', [
-    'links' => [route(ControlPanel::class) => I18N::translate('Control panel'), $title],
+    'links' => [route(ControlPanel::class) => MoreI18N::xlate('Control panel'), $title],
 ]) ?>
 
 <h1><?= e($title) ?></h1>
@@ -30,7 +31,7 @@ use Fisharebest\Webtrees\Tree;
         <table class="table table-sm table-striped align-middle">
             <thead>
                 <tr>
-                    <th><?= I18N::translate('Family tree') ?></th>
+                    <th><?= MoreI18N::xlate('Family tree') ?></th>
                     <th><?= I18N::translate('Research purpose') ?></th>
                 </tr>
             </thead>
@@ -55,6 +56,6 @@ use Fisharebest\Webtrees\Tree;
     <p class="small text-muted"><?= I18N::translate('The purpose is stored as a tree preference. Existing GEDCOM HEAD notes are not changed.') ?></p>
 
     <button class="btn btn-primary" type="submit">
-        <?= I18N::translate('save') ?>
+        <?= MoreI18N::xlate('save') ?>
     </button>
 </form>

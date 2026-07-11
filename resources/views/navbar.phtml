@@ -6,6 +6,7 @@ namespace TreesListModule;
 
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
+use TreesListModule\MoreI18N;
 
 ?>
 <div class="family-trees-list">
@@ -18,10 +19,10 @@ use Fisharebest\Webtrees\I18N;
         $tree_id = $tree->id();
         $stats = [];
         foreach ([
-            'families' => [I18N::translate('Families'), $families],
-            'individuals' => [I18N::translate('Individuals'), $individuals],
-            'events' => [I18N::translate('Events'), $events],
-            'surnames' => [I18N::translate('Surnames'), $surnames],
+            'families' => [MoreI18N::xlate('Families'), $families],
+            'individuals' => [MoreI18N::xlate('Individuals'), $individuals],
+            'events' => [MoreI18N::xlate('Events'), $events],
+            'surnames' => [MoreI18N::xlate('Surnames'), $surnames],
         ] as $key => [$label, $values]) {
             if (isset($visible_fields[$key])) {
                 $stats[] = ['label' => $label, 'value' => (int) ($values[$tree_id] ?? 0)];

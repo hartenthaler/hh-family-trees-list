@@ -23,7 +23,7 @@ The module respects the global webtrees setting **Show list of family trees**. I
 - statistics for each family tree
 - block configuration for layout, sort order, and displayed fields
 - one administratively maintained research purpose per family tree
-- custom translations for German, Dutch, Simplified Chinese, and Traditional Chinese
+- gettext PO/MO translations for German, Dutch, Simplified Chinese, and Traditional Chinese
 
 ## 🧩 Installation
 

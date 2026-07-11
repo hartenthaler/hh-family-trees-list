@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Hartenthaler\Webtrees\Module\FamilyTreesList;
 
 use Fisharebest\Localization\Translation;
+use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\FlashMessages;
+use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\HtmlBlockModule;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
@@ -84,6 +86,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
         View::registerCustomView('::config', $this->name() . '::config');
         View::registerCustomView('::capsule', $this->name() . '::capsule');
         View::registerCustomView('::navbar', $this->name() . '::navbar');
+        View::registerCustomView('::disabled-notice', $this->name() . '::disabled-notice');
     }
 
     public function headContent(): string
@@ -185,7 +188,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
     public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
         if (!$this->siteAllowsTreeList()) {
-            return '';
+            return Auth::isAdmin() ? $this->disabledTreeListNotice($tree, $block_id, $context) : '';
         }
 
         $info_style = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
@@ -257,6 +260,8 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
     public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
     {
+        $this->checkBlockConfigurationAccess();
+
         $info_style = Validator::parsedBody($request)->string('infoStyle', self::DEFAULT_STYLE);
         $sort_style = Validator::parsedBody($request)->string('sortStyle', self::DEFAULT_SORT);
         $params = (array) $request->getParsedBody();
@@ -277,6 +282,8 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
     public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
+        $this->checkBlockConfigurationAccess();
+
         return view('config', [
             'info_style' => $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE),
             'info_styles' => $this->infoStyles(),
@@ -284,6 +291,30 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
             'sort_styles' => $this->sortStyles(),
             'field_options' => $this->fieldOptions(),
             'visible_fields' => array_fill_keys($this->visibleFields($this->getBlockSetting($block_id, 'visibleFields', self::DEFAULT_VISIBLE_FIELDS)), true),
+        ]);
+    }
+
+    private function checkBlockConfigurationAccess(): void
+    {
+        if (!Auth::isAdmin()) {
+            throw new HttpAccessDeniedException();
+        }
+    }
+
+    private function disabledTreeListNotice(Tree $tree, int $block_id, string $context): string
+    {
+        $content = view('disabled-notice');
+
+        if ($context === ModuleBlockInterface::CONTEXT_EMBED) {
+            return $content;
+        }
+
+        return view('modules/block-template', [
+            'block' => Str::kebab($this->name()),
+            'id' => $block_id,
+            'config_url' => $this->configUrl($tree, $context, $block_id),
+            'title' => $this->title(),
+            'content' => $content,
         ]);
     }
 

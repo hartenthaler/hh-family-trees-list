@@ -6,14 +6,14 @@ It is maintained as a modernized fork of the original **Family-Trees-List** modu
 
 ## 📌 Purpose
 
-The module adds a configurable block for user and tree home pages. It can show all family trees on the website together with useful summary figures:
+The module adds a configurable block that can be placed on a personal **My page** or on the home page of a family tree. It can show all family trees on the website together with useful summary figures:
 
 - families
 - individuals
 - events
 - surnames
 
-The module respects the global webtrees setting **Show list of family trees**. If this webtrees setting is disabled, the block does not render a family tree list.
+The module respects the global webtrees setting **Show list of family trees**. The block is displayed only when this option is set to **yes** under **Control panel → Website preferences**. If it is disabled, visitors and other non-administrators see neither the block nor a hint that other family trees may exist. Administrators see a configuration hint instead.
 
 ## ✨ Features
 
@@ -52,6 +52,8 @@ Each block can be configured separately:
 - **Sort order**: internal tree number, oldest first or newest first
 - **Displayed fields**: research purpose, families, individuals, events, and surnames; the family-tree name is always shown
 
+Only site administrators can configure the block. Its visibility for other users is controlled independently by the regular webtrees block visibility setting. A block may therefore also be visible to visitors if **Visitors** has been selected there.
+
 In the module settings, an administrator can assign one principal research purpose to each family tree. The available purposes are aligned with the research-purpose sections of `hh_legal_notice`, including a purpose for test trees. The purpose is stored as a webtrees tree preference and can be enabled as an optional field in every block.
 
 Other modules can obtain the translated purpose for a tree through the public method `researchPurpose(Tree $tree): string`. It returns an empty string if no purpose has been assigned. The complete contract and an optional-integration example are documented in [`docs/public-api.md`](docs/public-api.md).
@@ -62,7 +64,7 @@ The module also follows the global webtrees setting:
 
 - **Website preferences → Show list of family trees**
 
-If this option is set to **no**, the module suppresses the family tree list.
+If this option is set to **no**, the module suppresses the family tree list. Administrators see a warning in the block position that identifies the required setting; all other users see no block.
 
 ## 🖼️ Display Styles
 

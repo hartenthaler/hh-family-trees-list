@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Hartenthaler\Webtrees\Module\FamilyTreesList\Internationalization\MoreI18N;
+
+?>
+
+<div class="alert alert-warning mb-0" role="alert">
+    <?= I18N::translate(
+        'This block is hidden because the site setting “%s” is set to “%s”. Change it to “%s” under “%s” → “%s”.',
+        MoreI18N::xlate('Show list of family trees'),
+        MoreI18N::xlate('no'),
+        MoreI18N::xlate('yes'),
+        MoreI18N::xlate('Control panel'),
+        MoreI18N::xlate('Website preferences')
+    ) ?>
+</div>

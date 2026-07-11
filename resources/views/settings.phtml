@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+
+/**
+ * @var string               $title
+ * @var array<int,Tree>      $trees
+ * @var array<string,string> $purpose_options
+ * @var string               $purpose_preference
+ */
+?>
+
+<?= view('components/breadcrumbs', [
+    'links' => [route(ControlPanel::class) => I18N::translate('Control panel'), $title],
+]) ?>
+
+<h1><?= e($title) ?></h1>
+
+<form method="post">
+    <?= csrf_field() ?>
+
+    <h2><?= I18N::translate('Research purposes of the family trees') ?></h2>
+    <p><?= I18N::translate('Select the main research purpose for each family tree. The value can optionally be displayed in this module\'s blocks.') ?></p>
+
+    <div class="table-responsive mb-3">
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+                <tr>
+                    <th><?= I18N::translate('Family tree') ?></th>
+                    <th><?= I18N::translate('Research purpose') ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($trees as $tree) : ?>
+                    <tr>
+                        <th scope="row"><?= e($tree->title()) ?></th>
+                        <td>
+                            <?= view('components/select', [
+                                'id' => 'purpose-' . $tree->id(),
+                                'name' => 'purpose[' . $tree->id() . ']',
+                                'selected' => $tree->getPreference($purpose_preference),
+                                'options' => $purpose_options,
+                            ]) ?>
+                        </td>
+                    </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="small text-muted"><?= I18N::translate('The purpose is stored as a tree preference. Existing GEDCOM HEAD notes are not changed.') ?></p>
+
+    <button class="btn btn-primary" type="submit">
+        <?= I18N::translate('save') ?>
+    </button>
+</form>

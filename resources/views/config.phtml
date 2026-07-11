@@ -12,6 +12,8 @@ use Fisharebest\Webtrees\I18N;
  * @var array<string,string> $info_styles
  * @var string               $sort_style
  * @var array<string,string> $sort_styles
+ * @var array<string,string> $field_options
+ * @var array<string,bool>   $visible_fields
  */
 
 ?>
@@ -24,6 +26,36 @@ use Fisharebest\Webtrees\I18N;
         <?= view('components/select', ['name' => 'infoStyle', 'selected' => $info_style, 'options' => $info_styles]) ?>
     </div>
 </div>
+
+<fieldset class="row mb-3">
+    <legend class="col-sm-3 col-form-label">
+        <?= I18N::translate('Displayed fields') ?>
+    </legend>
+    <div class="col-sm-9">
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="visibleFieldTree" checked disabled>
+            <label class="form-check-label" for="visibleFieldTree">
+                <?= I18N::translate('Family tree') ?>
+            </label>
+        </div>
+        <?php foreach ($field_options as $key => $label) : ?>
+            <div class="form-check mb-2">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="visibleFields[<?= e($key) ?>]"
+                    id="visibleField-<?= e($key) ?>"
+                    value="1"
+                    <?= isset($visible_fields[$key]) ? 'checked' : '' ?>
+                >
+                <label class="form-check-label" for="visibleField-<?= e($key) ?>">
+                    <?= e($label) ?>
+                </label>
+            </div>
+        <?php endforeach ?>
+        <div class="form-text"><?= I18N::translate('The family tree name is always displayed.') ?></div>
+    </div>
+</fieldset>
 
 <div class="row mb-3">
     <label class="col-sm-3 col-form-label" for="sortStyle">

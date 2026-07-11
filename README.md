@@ -21,7 +21,8 @@ The module respects the global webtrees setting **Show list of family trees**. I
 - sortable table view
 - responsive layouts for desktop and mobile screens
 - statistics for each family tree
-- block configuration for layout and sort order
+- block configuration for layout, sort order, and displayed fields
+- one administratively maintained research purpose per family tree
 - custom translations for German, Dutch, Simplified Chinese, and Traditional Chinese
 
 ## 🧩 Installation
@@ -49,6 +50,11 @@ Each block can be configured separately:
 
 - **Layout**: list, table, card, capsule, or navbar
 - **Sort order**: internal tree number, oldest first or newest first
+- **Displayed fields**: research purpose, families, individuals, events, and surnames; the family-tree name is always shown
+
+In the module settings, an administrator can assign one principal research purpose to each family tree. The available purposes are aligned with the research-purpose sections of `hh_legal_notice`. The purpose is stored as a webtrees tree preference and can be enabled as an optional field in every block.
+
+The module deliberately does not write this category to `HEAD:NOTE`. GEDCOM header notes are unrestricted free text, and `extended_import_export` can use the first such note as the complete GEDBAS description. A future export integration may map the structured purpose explicitly without overwriting existing header notes.
 
 The module also follows the global webtrees setting:
 

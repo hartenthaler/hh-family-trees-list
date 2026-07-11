@@ -74,6 +74,11 @@
     min-width: 0;
 }
 
+.family-trees-list__purpose {
+    color: var(--ftl-muted);
+    font-size: .9rem;
+}
+
 .family-trees-list__title img,
 .family-trees-list__stat img,
 .family-trees-list__table-icon {
@@ -164,6 +169,14 @@
     font-weight: 700;
     justify-content: center;
     min-width: 4.5rem;
+    padding: .5rem .65rem;
+}
+
+.family-trees-list__navbar-purpose {
+    align-items: center;
+    border-inline-start: 1px solid var(--ftl-border);
+    color: var(--ftl-muted);
+    display: inline-flex;
     padding: .5rem .65rem;
 }
 

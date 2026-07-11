@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace TreesListModule;
 
+use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\HtmlBlockModule;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Module\ModuleBlockTrait;
+use Fisharebest\Webtrees\Module\ModuleConfigInterface;
+use Fisharebest\Webtrees\Module\ModuleConfigTrait;
 use Fisharebest\Webtrees\Module\ModuleCustomInterface;
 use Fisharebest\Webtrees\Module\ModuleCustomTrait;
 use Fisharebest\Webtrees\Module\ModuleGlobalInterface;
@@ -23,16 +26,19 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 use function count;
 use function e;
 use function in_array;
+use function redirect;
 use function view;
 
-class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, ModuleBlockInterface, ModuleGlobalInterface
+class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, ModuleBlockInterface, ModuleConfigInterface, ModuleGlobalInterface
 {
     use ModuleBlockTrait;
     use ModuleCustomTrait;
+    use ModuleConfigTrait;
     use ModuleGlobalTrait;
 
     public const CUSTOM_MODULE = 'hh-family-trees-list';
@@ -41,6 +47,11 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
     private const DEFAULT_SORT = 'id_desc';
     private const DEFAULT_STYLE = 'list';
+    private const DEFAULT_VISIBLE_FIELDS = 'families,individuals,events,surnames';
+    private const TREE_PURPOSE_PREFERENCE = 'HH_FAMILY_TREES_PURPOSE';
+
+    /** @var list<string> */
+    private const OPTIONAL_FIELDS = ['purpose', 'families', 'individuals', 'events', 'surnames'];
 
     private TreeService $tree_service;
 
@@ -176,6 +187,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
         $info_style = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
         $sort_style = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
+        $visible_fields = $this->visibleFields($this->getBlockSetting($block_id, 'visibleFields', self::DEFAULT_VISIBLE_FIELDS));
         if (!in_array($info_style, array_keys($this->infoStyles()), true)) {
             $info_style = self::DEFAULT_STYLE;
         }
@@ -190,10 +202,12 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
         $content = view($info_style, [
             'block_id' => $block_id,
             'all_trees' => $sorted_trees->all(),
-            'individuals' => $this->totalIndividuals(),
-            'families' => $this->totalFamilies(),
-            'events' => $this->totalEvents(),
-            'surnames' => $this->totalSurnames(),
+            'individuals' => in_array('individuals', $visible_fields, true) ? $this->totalIndividuals() : [],
+            'families' => in_array('families', $visible_fields, true) ? $this->totalFamilies() : [],
+            'events' => in_array('events', $visible_fields, true) ? $this->totalEvents() : [],
+            'surnames' => in_array('surnames', $visible_fields, true) ? $this->totalSurnames() : [],
+            'purposes' => in_array('purpose', $visible_fields, true) ? $this->treePurposeLabels($sorted_trees) : [],
+            'visible_fields' => array_fill_keys($visible_fields, true),
             'treeicon' => $this->assetUrl('images/tree.png'),
             'familyicon' => $this->assetUrl('images/families.png'),
             'individualicon' => $this->assetUrl('images/person2.png'),
@@ -242,6 +256,8 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
     {
         $info_style = Validator::parsedBody($request)->string('infoStyle', self::DEFAULT_STYLE);
         $sort_style = Validator::parsedBody($request)->string('sortStyle', self::DEFAULT_SORT);
+        $params = (array) $request->getParsedBody();
+        $visible_fields = array_values(array_intersect(self::OPTIONAL_FIELDS, array_keys((array) ($params['visibleFields'] ?? []))));
 
         if (!in_array($info_style, array_keys($this->infoStyles()), true)) {
             $info_style = self::DEFAULT_STYLE;
@@ -253,6 +269,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
 
         $this->setBlockSetting($block_id, 'infoStyle', $info_style);
         $this->setBlockSetting($block_id, 'sortStyle', $sort_style);
+        $this->setBlockSetting($block_id, 'visibleFields', implode(',', $visible_fields));
     }
 
     public function editBlockConfiguration(Tree $tree, int $block_id): string
@@ -262,7 +279,84 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
             'info_styles' => $this->infoStyles(),
             'sort_style' => $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT),
             'sort_styles' => $this->sortStyles(),
+            'field_options' => $this->fieldOptions(),
+            'visible_fields' => array_fill_keys($this->visibleFields($this->getBlockSetting($block_id, 'visibleFields', self::DEFAULT_VISIBLE_FIELDS)), true),
         ]);
+    }
+
+    public function getAdminAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->layout = 'layouts/administration';
+
+        return $this->viewResponse($this->name() . '::settings', [
+            'title' => $this->title(),
+            'trees' => $this->tree_service->all()->sortBy(static fn (Tree $tree): string => $tree->title())->all(),
+            'purpose_options' => ['' => I18N::translate('Not specified')] + $this->purposeOptions(),
+            'purpose_preference' => self::TREE_PURPOSE_PREFERENCE,
+        ]);
+    }
+
+    public function postAdminAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $params = (array) $request->getParsedBody();
+        $submitted = (array) ($params['purpose'] ?? []);
+        $valid = array_keys($this->purposeOptions());
+
+        foreach ($this->tree_service->all() as $tree) {
+            $purpose = (string) ($submitted[$tree->id()] ?? '');
+            $tree->setPreference(self::TREE_PURPOSE_PREFERENCE, in_array($purpose, $valid, true) ? $purpose : '');
+        }
+
+        FlashMessages::addMessage(I18N::translate('The research purposes of the family trees have been updated.'), 'success');
+
+        return redirect($this->getConfigLink());
+    }
+
+    /** @return list<string> */
+    private function visibleFields(string $stored): array
+    {
+        return array_values(array_intersect(self::OPTIONAL_FIELDS, explode(',', $stored)));
+    }
+
+    /** @return array<string,string> */
+    private function fieldOptions(): array
+    {
+        return [
+            'purpose' => I18N::translate('Research purpose'),
+            'families' => I18N::translate('Families'),
+            'individuals' => I18N::translate('Individuals'),
+            'events' => I18N::translate('Events'),
+            'surnames' => I18N::translate('Surnames'),
+        ];
+    }
+
+    /** @return array<string,string> */
+    private function purposeOptions(): array
+    {
+        return [
+            'ResearchFamily' => I18N::translate('Family and ancestry research'),
+            'ResearchOns' => I18N::translate('One-name study'),
+            'ResearchPlace' => I18N::translate('One-place study or local family book'),
+            'ResearchFarm' => I18N::translate('Farm and farmstead research'),
+            'ResearchTopic' => I18N::translate('Thematic research'),
+            'ResearchMigration' => I18N::translate('Migration research'),
+            'ResearchCommunity' => I18N::translate('Community research'),
+        ];
+    }
+
+    /**
+     * @param Collection<int,Tree> $trees
+     * @return array<int,string>
+     */
+    private function treePurposeLabels(Collection $trees): array
+    {
+        $options = $this->purposeOptions();
+        $labels = [];
+        foreach ($trees as $tree) {
+            $labels[$tree->id()] = $options[$tree->getPreference(self::TREE_PURPOSE_PREFERENCE)] ?? '';
+        }
+
+        return $labels;
     }
 
     /**
@@ -318,6 +412,21 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
             'sort by internal tree number, oldest first' => 'Sortieren nach interner Stammbaum-Nummer, älteste zuerst',
             'sort by internal tree number, newest first' => 'Sortieren nach interner Stammbaum-Nummer, neueste zuerst',
             '*Click on the header to sort the values.' => '*Klicken Sie auf die Kopfzeile, um die Werte zu sortieren.',
+            'Research purpose' => 'Forschungszweck',
+            'Not specified' => 'Nicht festgelegt',
+            'Family and ancestry research' => 'Familien- und Ahnenforschung',
+            'One-name study' => 'Namensträgerstudie',
+            'One-place study or local family book' => 'Ortsstudie oder Ortsfamilienbuch',
+            'Farm and farmstead research' => 'Höfeforschung',
+            'Thematic research' => 'Themenbezogene Forschung',
+            'Migration research' => 'Migrationsforschung',
+            'Community research' => 'Gemeinschaftsforschung',
+            'Displayed fields' => 'Angezeigte Felder',
+            'The family tree name is always displayed.' => 'Der Name des Stammbaums wird immer angezeigt.',
+            'Research purposes of the family trees' => 'Forschungszwecke der Stammbäume',
+            'Select the main research purpose for each family tree. The value can optionally be displayed in this module\'s blocks.' => 'Wählen Sie für jeden Stammbaum den wichtigsten Forschungszweck. Der Wert kann optional in den Blöcken dieses Moduls angezeigt werden.',
+            'The research purposes of the family trees have been updated.' => 'Die Forschungszwecke der Stammbäume wurden aktualisiert.',
+            'The purpose is stored as a tree preference. Existing GEDCOM HEAD notes are not changed.' => 'Der Zweck wird als Einstellung des Stammbaums gespeichert. Vorhandene GEDCOM-HEAD-Notizen werden nicht verändert.',
         ];
     }
 

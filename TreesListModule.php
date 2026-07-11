@@ -341,7 +341,16 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
             'ResearchTopic' => I18N::translate('Thematic research'),
             'ResearchMigration' => I18N::translate('Migration research'),
             'ResearchCommunity' => I18N::translate('Community research'),
+            'ResearchTest' => I18N::translate('Test'),
         ];
+    }
+
+    /**
+     * Return the configured research purpose for a family tree in the current user language.
+     */
+    public function researchPurpose(Tree $tree): string
+    {
+        return $this->purposeOptions()[$tree->getPreference(self::TREE_PURPOSE_PREFERENCE)] ?? '';
     }
 
     /**
@@ -421,6 +430,7 @@ class TreesListModule extends HtmlBlockModule implements ModuleCustomInterface, 
             'Thematic research' => 'Themenbezogene Forschung',
             'Migration research' => 'Migrationsforschung',
             'Community research' => 'Gemeinschaftsforschung',
+            'Test' => 'Test',
             'Displayed fields' => 'Angezeigte Felder',
             'The family tree name is always displayed.' => 'Der Name des Stammbaums wird immer angezeigt.',
             'Research purposes of the family trees' => 'Forschungszwecke der Stammbäume',

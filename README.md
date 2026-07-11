@@ -52,7 +52,9 @@ Each block can be configured separately:
 - **Sort order**: internal tree number, oldest first or newest first
 - **Displayed fields**: research purpose, families, individuals, events, and surnames; the family-tree name is always shown
 
-In the module settings, an administrator can assign one principal research purpose to each family tree. The available purposes are aligned with the research-purpose sections of `hh_legal_notice`. The purpose is stored as a webtrees tree preference and can be enabled as an optional field in every block.
+In the module settings, an administrator can assign one principal research purpose to each family tree. The available purposes are aligned with the research-purpose sections of `hh_legal_notice`, including a purpose for test trees. The purpose is stored as a webtrees tree preference and can be enabled as an optional field in every block.
+
+Other modules can obtain the translated purpose for a tree through the public method `researchPurpose(Tree $tree): string`. It returns an empty string if no purpose has been assigned.
 
 The module deliberately does not write this category to `HEAD:NOTE`. GEDCOM header notes are unrestricted free text, and `extended_import_export` can use the first such note as the complete GEDBAS description. A future export integration may map the structured purpose explicitly without overwriting existing header notes.
 

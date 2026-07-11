@@ -116,3 +116,8 @@ msgstr ""
 
 msgid "The purpose is stored as a tree preference. Existing GEDCOM HEAD notes are not changed."
 msgstr ""
+
+#: resources/views/disabled-notice.phtml
+#, php-format
+msgid "This block is hidden because the site setting “%s” is set to “%s”. Change it to “%s” under “%s” → “%s”."
+msgstr ""

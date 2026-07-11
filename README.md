@@ -78,6 +78,16 @@ The maintained fork keeps the original idea of several compact display styles, b
 
 This fork targets webtrees 2.2.x.
 
+## 🌐 Translations
+
+Many thanks to the translators who made the module available in several languages:
+
+- **German:** [Hermann Hartenthaler](https://github.com/hartenthaler)
+- **Dutch:** [TheDutchJewel](https://github.com/TheDutchJewel)
+- **Simplified and Traditional Chinese:** [果然 (iyoua)](https://github.com/iyoua)
+
+The earlier PHP translation arrays were migrated to gettext PO/MO catalogs without discarding the contributed translations.
+
 ## 🤝 Credits
 
 This module is based on the original **Family-Trees-List** module by **iyoua**.

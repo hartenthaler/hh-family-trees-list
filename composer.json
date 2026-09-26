@@ -1,0 +1,18 @@
+{
+  "name": "hartenthaler/hh-family-trees-list",
+  "description": "Displays a compact overview of the family trees on a webtrees website.",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/hartenthaler/hh-family-trees-list",
+  "support": {
+    "issues": "https://github.com/hartenthaler/hh-family-trees-list/issues"
+  },
+  "extra": {
+    "webtrees-custom-module": {
+      "title": "Family Trees List",
+      "description": "Displays a compact overview of the family trees on a webtrees website.",
+      "github-repo": "https://github.com/hartenthaler/hh-family-trees-list",
+      "tag-prefix": "v",
+      "category": "frontend"
+    }
+  }
+}
